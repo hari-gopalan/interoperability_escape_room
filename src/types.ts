@@ -1,0 +1,9 @@
+export type ScenarioId='A'|'B'|'C'|'D'|'E';
+export interface Option{id:string;text:string}
+export interface Question{id:string;number:number;competencyId:string;competency:string;context:string;prompt:string;options:Option[];correctOptionId:string;hintAfterFirstWrong:string;hintAfterSecondWrong:string;explanation:string}
+export interface Room{id:string;number:number;title:string;narrativeIntro:string;transitionText:string;questions:Question[]}
+export interface Scenario{id:ScenarioId;title:string;role:string;introduction:string;rooms:Room[]}
+export interface Student{studentId:string;displayName:string;username:string;scenarioId:ScenarioId;enabled:boolean}
+export interface Attempt{timestamp:string;studentId:string;studentName:string;scenarioId:ScenarioId;questionId:string;competencyId:string;attemptNumber:number;selectedOption:string;correct:boolean;questionCompleted:boolean;pointsEarnedWhenCompleted:number}
+export interface Result{studentId:string;displayName:string;scenarioId:ScenarioId;weightedRawScore:number;transmutedGrade:number;passed:boolean;firstAttemptCount:number;secondAttemptCount:number;thirdAttemptCount:number;missedCount:number;completedAt:string}
+export interface Progress{student:Student;attempts:Attempt[];currentQuestion:number;completed:boolean;result?:Result}
