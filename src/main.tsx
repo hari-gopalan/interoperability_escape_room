@@ -406,7 +406,8 @@ function StudentApp({
       setBusy(false);
     }
   }
-  if (p.completed && p.result) return <ResultView p={p} onExit={onExit} />;
+  if (p.completed && p.result)
+    return <ResultView p={p} onExit={onExit} onReset={resetForTesting} />;
   const remaining = 3 - prior.length,
     max = POINTS[Math.min(prior.length, 2)];
   return (
@@ -588,7 +589,15 @@ function StudentApp({
     </Shell>
   );
 }
-function ResultView({ p, onExit }: { p: Progress; onExit: () => void }) {
+function ResultView({
+  p,
+  onExit,
+  onReset,
+}: {
+  p: Progress;
+  onExit: () => void;
+  onReset: () => Promise<void>;
+}) {
   const [r, setReview] = useState(false),
     x = p.result!,
     s = scenario(x.scenarioId),
@@ -625,6 +634,9 @@ function ResultView({ p, onExit }: { p: Progress; onExit: () => void }) {
         <div className="actions">
           <button className="primary" onClick={() => setReview(!r)}>
             {r ? "Close review" : "Review my incident"}
+          </button>
+          <button className="danger" onClick={onReset}>
+            Reset and replay
           </button>
           <button onClick={onExit}>Sign out</button>
         </div>
