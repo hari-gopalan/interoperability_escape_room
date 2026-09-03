@@ -2,7 +2,7 @@ type Cue = "tap" | "evidence" | "wrong" | "correct" | "door";
 let ctx: AudioContext | null = null;
 let musicGain: GainNode | null = null;
 let effectsGain: GainNode | null = null;
-let musicOn = false;
+let musicOn = true;
 let musicBuilt = false;
 let musicTimer: number | null = null;
 let musicStep = 0;
@@ -152,4 +152,18 @@ export function setMusic(enabled: boolean) {
 
 export function musicEnabled() {
   return musicOn;
+}
+
+export function armDefaultMusic() {
+  const unlock = () => {
+    window.removeEventListener("pointerdown", unlock, true);
+    window.removeEventListener("keydown", unlock, true);
+    if (musicOn) setMusic(true);
+  };
+  window.addEventListener("pointerdown", unlock, true);
+  window.addEventListener("keydown", unlock, true);
+  return () => {
+    window.removeEventListener("pointerdown", unlock, true);
+    window.removeEventListener("keydown", unlock, true);
+  };
 }

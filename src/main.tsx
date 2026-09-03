@@ -12,7 +12,7 @@ import { INSTRUCTOR_PIN, POLL_INTERVAL_MS } from "./config";
 import { allQuestions, competencies, scenarios } from "./data/scenarios";
 import * as api from "./api";
 import { band, blankProgress, POINTS, resultFor } from "./scoring";
-import { musicEnabled, playCue, setMusic } from "./audio";
+import { armDefaultMusic, musicEnabled, playCue, setMusic } from "./audio";
 import type {
   Attempt,
   Progress,
@@ -34,6 +34,7 @@ function Shell({
   immersive?: boolean;
 }) {
   const [music, setMusicState] = useState(musicEnabled());
+  useEffect(() => armDefaultMusic(), []);
   return (
     <div className={`app-shell${immersive ? " immersive" : ""}`}>
       <div className="ambient-grid" aria-hidden="true" />
