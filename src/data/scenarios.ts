@@ -170,16 +170,16 @@ function content(p: P, n: number): B {
     },
     {
       prompt:
-        "What gives the strongest evidence that the vendor integration claim is correct?",
+        "What is the best way to check that the connection promised by the vendor will work in this hospital?",
       answers: [
-        "The vendor repeats the claim",
-        "Another hospital owns the same model",
-        "Both product pages mention DICOM",
-        "Test the intended end-to-end workflow in the organization’s environment",
+        "Ask the vendor to repeat that the system is compatible",
+        "Accept that it will work because another hospital uses the same model",
+        "Check that both product brochures mention DICOM",
+        "Test the complete workflow in this hospital, from the order and worklist to the images arriving correctly in PACS",
       ],
       correct: 3,
       explanation:
-        "A realistic end-to-end local test directly validates the intended workflow.",
+        "A system may work in another hospital but still fail here because hospitals can use different RIS and PACS products, settings, procedure names, interfaces and work processes. The team should test the complete workflow in this hospital several times using realistic cases. It should confirm that the order reaches the modality, the correct patient and examination appear on the worklist, and the acquired images arrive in PACS with the correct information. Repeating the end-to-end test provides much stronger evidence than relying on a vendor statement or another hospital's experience.",
     },
     {
       prompt: "Which description best separates HL7 and DICOM in this project?",
@@ -367,7 +367,7 @@ function storyBeat(p: P, n: number) {
   return [
     `The procurement committee has narrowed its shortlist for the ${p.title}. The new ${p.modality} cannot operate as an isolated device: acquired images and their associated patient and examination information must reach PACS reliably so clinicians can locate and use the correct study. A vendor presentation is about to begin, and the committee asks you which interoperability standard should be investigated first.`,
     `The vendor points to a DICOM logo and assures the committee that integration is settled. Before the purchase recommendation is signed, the clinical team turns to you and asks whether that statement is enough.`,
-    `Two proposals remain. Marketing claims and reference sites sound reassuring, but the committee needs defensible evidence that the selected ${p.modality} will work inside this hospital's real environment.`,
+    `Two proposals remain. The vendor says its ${p.modality} can connect to the hospital's scheduling system, worklist and PACS. The same model is already working at another hospital, but that hospital may use different systems, settings and procedures. Before choosing a product, the committee asks how it can check the vendor's promise in this hospital.`,
     `Months later, the equipment has arrived. Registration, scheduling, orders, reports and images now have to travel through different parts of the workflow, and the implementation team is mixing up the roles of the standards involved.`,
     `During a pressured shift, ${p.staff} repeatedly fails to locate a scheduled examination. You observe the user abandon the scheduled path and recreate the patient and examination at the modality while the waiting list grows.`,
     `The connection is now transmitting data, but the order term “${p.pair[0]}” reaches imaging as “${p.pair[1]}.” Staff treat them differently even though the project team intended the same procedure.`,
