@@ -22,6 +22,8 @@ The original Kano backend cannot support this assessment as-is because its actio
 
 The script creates these tabs automatically: `Interop_Students`, `Interop_Attempts`, `Interop_Results`, `Interop_Progress`. Add students manually to `Interop_Students` using exactly these columns:
 
+Opening the deployed application calls the backend setup endpoint and creates all four tabs. You can also select and run `setupInteroperability` once from the Apps Script editor.
+
 `studentId | displayName | username | accessCode | scenarioId | enabled`
 
 Example: `2026-001 | Sofia Reyes | sreyes | 4821 | A | TRUE`. Scenario must be A, B, C, D or E. One scenario is assigned per student. Set `enabled` to TRUE.
