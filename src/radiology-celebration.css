@@ -64,7 +64,12 @@
   max-height: 92vh;
   overflow: auto;
   text-align: center;
-  background: linear-gradient(160deg, #fff, #edf8f2);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.94),
+    rgba(226, 244, 235, 0.91)
+  );
+  backdrop-filter: blur(24px) saturate(1.15);
   border: 1px solid #8fd1b2;
   border-radius: 24px;
   padding: 2rem clamp(1.25rem, 5vw, 3rem) 2.4rem;

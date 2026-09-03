@@ -118,8 +118,29 @@
   overflow: auto;
   margin: 0 !important;
   border-radius: 22px !important;
+  border: 1px solid rgba(170, 224, 199, 0.72) !important;
+  background: rgba(245, 251, 248, 0.91) !important;
+  backdrop-filter: blur(22px) saturate(1.12);
+  color: #14251e;
   box-shadow: 0 35px 90px rgba(0, 0, 0, 0.52) !important;
   animation: question-modal-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.investigation-panel {
+  scrollbar-width: thin;
+  scrollbar-color: #257b5c rgba(218, 235, 227, 0.7);
+}
+.investigation-panel::-webkit-scrollbar {
+  width: 11px;
+}
+.investigation-panel::-webkit-scrollbar-track {
+  margin: 14px 0;
+  border-radius: 20px;
+  background: rgba(218, 235, 227, 0.72);
+}
+.investigation-panel::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 20px;
+  background: linear-gradient(#318b68, #0c5940) padding-box;
 }
 .investigation-panel .close-investigation {
   position: sticky;
@@ -139,7 +160,7 @@
   padding: 1rem 1.1rem;
   border-left: 3px solid #1b9168;
   border-radius: 0 10px 10px 0;
-  background: #edf7f2;
+  background: rgba(225, 242, 234, 0.78);
   color: #334b40;
 }
 .story-briefing span {

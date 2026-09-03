@@ -150,11 +150,11 @@ type B = {
 function content(p: P, n: number): B {
   return [
     {
-      prompt: `The ${p.modality} must exchange imaging information with PACS. Which standard should be investigated first?`,
+      prompt: `The hospital needs the ${p.modality} to send images and imaging-related patient and examination information to PACS without creating an isolated workflow. Which interoperability standard should the procurement team investigate first?`,
       answers: ["DICOM", "ICD", "FHIR", "A local spreadsheet format"],
       correct: 0,
       explanation:
-        "DICOM is the primary standard for medical imaging information and imaging-related workflows.",
+        "DICOM is the primary standard for medical images and imaging-related information exchanged between modalities and systems such as PACS. Identifying DICOM is the correct starting point, but the team must still confirm that both products support compatible DICOM capabilities for the intended workflow. If those capabilities, configurations or information exchanges do not align, images or associated patient and examination information may not communicate correctly even when both products claim DICOM support.",
     },
     {
       prompt: `The vendor says the ${p.modality} is DICOM compliant, and PACS supports DICOM. Does this guarantee the required workflow?`,
@@ -365,7 +365,7 @@ const hints2 = [
 ];
 function storyBeat(p: P, n: number) {
   return [
-    `The procurement committee has narrowed its shortlist for the ${p.title.toLowerCase()}. A vendor presentation is about to begin, and you have been asked to identify the first standard the team should place on its investigation board.`,
+    `The procurement committee has narrowed its shortlist for the ${p.title}. The new ${p.modality} cannot operate as an isolated device: acquired images and their associated patient and examination information must reach PACS reliably so clinicians can locate and use the correct study. A vendor presentation is about to begin, and the committee asks you which interoperability standard should be investigated first.`,
     `The vendor points to a DICOM logo and assures the committee that integration is settled. Before the purchase recommendation is signed, the clinical team turns to you and asks whether that statement is enough.`,
     `Two proposals remain. Marketing claims and reference sites sound reassuring, but the committee needs defensible evidence that the selected ${p.modality} will work inside this hospital's real environment.`,
     `Months later, the equipment has arrived. Registration, scheduling, orders, reports and images now have to travel through different parts of the workflow, and the implementation team is mixing up the roles of the standards involved.`,
