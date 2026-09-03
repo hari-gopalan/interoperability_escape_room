@@ -5,11 +5,13 @@ import "./incident-room.css";
 import "./scene.css";
 import "./radiology-celebration.css";
 import "./fullscreen-room.css";
+import "./audio.css";
 import "./reduced-motion.css";
 import { INSTRUCTOR_PIN, POLL_INTERVAL_MS } from "./config";
 import { allQuestions, competencies, scenarios } from "./data/scenarios";
 import * as api from "./api";
 import { band, blankProgress, POINTS, resultFor } from "./scoring";
+import { musicEnabled, playCue, setMusic } from "./audio";
 import type {
   Attempt,
   Progress,
@@ -30,6 +32,7 @@ function Shell({
   children: React.ReactNode;
   immersive?: boolean;
 }) {
+  const [music, setMusicState] = useState(musicEnabled());
   return (
     <div className={`app-shell${immersive ? " immersive" : ""}`}>
       <div className="ambient-grid" aria-hidden="true" />
@@ -44,8 +47,18 @@ function Shell({
             <small>Radiology information integrity response unit</small>
           </div>
         </div>
-        <div className="system-state">
-          <i /> SYSTEM LINK ACTIVE
+        <div className="audio-system">
+          <button
+            className="sound-toggle"
+            onClick={() => setMusicState(setMusic(!music))}
+            aria-pressed={music}
+            aria-label={`${music ? "Turn off" : "Turn on"} background music`}
+          >
+            <span>{music ? "♫" : "♪"}</span> MUSIC {music ? "ON" : "OFF"}
+          </button>
+          <div className="system-state">
+            <i /> SYSTEM LINK ACTIVE
+          </div>
         </div>
         <span className="institution">DLSMHSI · MS Radiologic Technology</span>
       </header>
@@ -81,6 +94,7 @@ function Login({
         if (p.trim().length < 4)
           throw Error("Choose a PIN with at least 4 characters.");
         const r = await api.login(u.trim(), p.trim());
+        setMusic(true);
         onStudent(
           r.progress ||
             api.cached(r.student.studentId) ||
@@ -240,7 +254,14 @@ function RoomScene({
                   ? "hotspot solved-object"
                   : "hotspot locked-object"
             }
-            onClick={i === active ? onOpen : undefined}
+            onClick={
+              i === active
+                ? () => {
+                    playCue("evidence");
+                    onOpen();
+                  }
+                : undefined
+            }
           >
             <span className="object-icon">
               {i < active ? "✓" : i === active ? "!" : "⌁"}
@@ -358,6 +379,7 @@ function StudentApp({
     const next = { ...p, attempts: [...p.attempts, a] };
     try {
       await api.saveAttempt(a, next);
+      playCue(correct ? "correct" : "wrong");
       setP(next);
       setSelected("");
     } catch {
@@ -367,6 +389,7 @@ function StudentApp({
     }
   }
   async function next() {
+    playCue("door");
     let np = { ...p, currentQuestion: Math.min(14, p.currentQuestion + 1) };
     if (p.currentQuestion === 14) {
       const r = resultFor(p.student, p.attempts);
@@ -518,7 +541,10 @@ function StudentApp({
                       name="answer"
                       checked={selected === o.id}
                       disabled={used}
-                      onChange={() => setSelected(o.id)}
+                      onChange={() => {
+                        playCue("tap");
+                        setSelected(o.id);
+                      }}
                     />
                     <b>{o.id}</b>
                     <span>{o.text}</span>

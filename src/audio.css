@@ -1,0 +1,50 @@
+.audio-system {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.52rem 0.72rem;
+  border-color: #c6ded2;
+  background: #edf7f2;
+  color: #075c42;
+  font:
+    750 0.66rem ui-monospace,
+    monospace;
+  letter-spacing: 0.08em;
+}
+.sound-toggle span {
+  font-size: 1rem;
+  line-height: 0.7;
+}
+.sound-toggle[aria-pressed="true"] {
+  background: #123f30;
+  color: #c7f2dd;
+  border-color: #2c7658;
+  box-shadow: 0 0 18px rgba(58, 170, 120, 0.16);
+}
+@media (max-width: 900px) {
+  .audio-system .system-state {
+    display: none;
+  }
+}
+@media (max-width: 650px) {
+  .brand small,
+  .institution {
+    display: none;
+  }
+  .sound-toggle {
+    font-size: 0;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+  }
+  .sound-toggle span {
+    font-size: 1.1rem;
+  }
+}
