@@ -24,9 +24,9 @@ The script creates these tabs automatically: `Interop_Students`, `Interop_Attemp
 
 Opening the deployed application calls the backend setup endpoint and creates all four tabs. You can also select and run `setupInteroperability` once from the Apps Script editor.
 
-`studentId | displayName | username | accessCode | scenarioId | enabled`
+`studentId | displayName | username | pin | scenarioId | enabled`
 
-Example: `2026-001 | Sofia Reyes | sreyes | 4821 | A | TRUE`. Scenario must be A, B, C, D or E. One scenario is assigned per student. Set `enabled` to TRUE.
+Students normally create their own record by entering a student name and choosing a PIN on first use. The backend assigns the least-used scenario from A to E to keep the class balanced. Returning students use the same name and PIN. The instructor may still add or edit rows manually. The `username` column remains blank for compatibility with existing sheets.
 
 Keep the instructor PIN in `src/config.ts` and `apps-script/Code.gs` synchronized. It is a classroom deterrent, not secure authentication.
 
