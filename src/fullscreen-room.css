@@ -1,0 +1,179 @@
+.app-shell:has(.escape-scene) main {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  position: relative;
+}
+.app-shell:has(.escape-scene) .studentbar {
+  position: absolute;
+  z-index: 20;
+  left: clamp(1rem, 3vw, 3rem);
+  right: clamp(1rem, 3vw, 3rem);
+  top: 1.25rem;
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(173, 232, 205, 0.3);
+  border-radius: 12px;
+  background: rgba(3, 22, 14, 0.7);
+  backdrop-filter: blur(13px);
+  color: #e9f7f0;
+}
+.test-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.test-controls button {
+  padding: 0.55rem 0.75rem;
+  background: rgba(244, 251, 247, 0.92);
+}
+.app-shell:has(.escape-scene) .roomhead {
+  display: none;
+}
+.app-shell:has(.escape-scene) .escape-scene {
+  width: 100%;
+  height: calc(100vh - 78px);
+  min-height: 650px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background-position: center;
+  box-shadow: inset 0 0 130px rgba(0, 0, 0, 0.35);
+}
+.app-shell:has(.escape-scene) .escape-scene:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 11, 7, 0.28),
+    transparent 35%,
+    rgba(2, 10, 6, 0.55)
+  );
+  pointer-events: none;
+}
+.app-shell:has(.escape-scene) .scene-title {
+  top: 17%;
+  left: 3%;
+  z-index: 4;
+}
+.app-shell:has(.escape-scene) .object-row {
+  z-index: 5;
+  left: 3%;
+  right: 3%;
+  bottom: 5%;
+  max-width: 1000px;
+  margin: auto;
+}
+.app-shell:has(.escape-scene) .scene-instruction {
+  z-index: 5;
+  top: 19%;
+  right: 3%;
+  background: rgba(3, 20, 13, 0.68);
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+.app-shell:has(.escape-scene) .corridor {
+  position: absolute;
+  z-index: 21;
+  top: 6.2rem;
+  right: 3%;
+  width: min(560px, 58vw);
+  margin: 0;
+}
+.app-shell:has(.escape-scene) .corridor div {
+  background: rgba(4, 24, 16, 0.72);
+  border-color: rgba(150, 218, 187, 0.32);
+  color: #a5c8b7;
+  backdrop-filter: blur(10px);
+}
+.app-shell:has(.escape-scene) .corridor .now {
+  background: #0a6b4c;
+  color: #fff;
+}
+.app-shell:has(.escape-scene) .awaiting-clue {
+  position: absolute;
+  z-index: 6;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #d7e9df;
+}
+.investigation-panel {
+  position: fixed !important;
+  z-index: 80 !important;
+  left: 50%;
+  top: 50%;
+  width: min(820px, calc(100vw - 2rem));
+  max-height: 88vh;
+  overflow: auto;
+  margin: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 22px !important;
+  box-shadow:
+    0 0 0 100vmax rgba(2, 13, 8, 0.76),
+    0 35px 90px rgba(0, 0, 0, 0.52) !important;
+  animation: question-modal-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.investigation-panel .close-investigation {
+  position: sticky;
+  float: right;
+  top: 0.4rem;
+}
+.investigation-panel .evidence-tab {
+  position: static;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+.investigation-panel h2 {
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+}
+@keyframes question-modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@media (max-width: 760px) {
+  .app-shell:has(.escape-scene) .escape-scene {
+    height: calc(100svh - 72px);
+    min-height: 660px;
+  }
+  .app-shell:has(.escape-scene) .studentbar {
+    align-items: center;
+    top: 0.7rem;
+  }
+  .case-id {
+    display: none;
+  }
+  .test-controls {
+    width: 100%;
+    justify-content: center;
+  }
+  .test-controls button {
+    font-size: 0.68rem;
+  }
+  .app-shell:has(.escape-scene) .corridor {
+    top: 4.8rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+  }
+  .app-shell:has(.escape-scene) .scene-title {
+    top: 15%;
+    left: 1rem;
+  }
+  .app-shell:has(.escape-scene) .object-row {
+    left: 1rem;
+    right: 1rem;
+  }
+  .investigation-panel {
+    max-height: 92svh;
+    padding: 1.2rem !important;
+  }
+}

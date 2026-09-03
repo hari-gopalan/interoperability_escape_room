@@ -4,6 +4,7 @@ import "./styles.css";
 import "./incident-room.css";
 import "./scene.css";
 import "./radiology-celebration.css";
+import "./fullscreen-room.css";
 import "./reduced-motion.css";
 import { INSTRUCTOR_PIN, POLL_INTERVAL_MS } from "./config";
 import { allQuestions, competencies, scenarios } from "./data/scenarios";
@@ -374,6 +375,31 @@ function StudentApp({
     setP(np);
     setSceneOpen(false);
   }
+  function previousQuestion() {
+    if (p.currentQuestion === 0) return;
+    setP({ ...p, currentQuestion: p.currentQuestion - 1 });
+    setSceneOpen(true);
+  }
+  async function resetForTesting() {
+    if (
+      !confirm(
+        "Reset this entire test attempt? All saved answers and the result will be removed.",
+      )
+    )
+      return;
+    setBusy(true);
+    try {
+      await api.resetStudent(p.student.studentId);
+      setP(blankProgress(p.student));
+      setSelected("");
+      setSceneOpen(false);
+      setMsg("");
+    } catch {
+      setMsg("The test reset could not be completed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
   if (p.completed && p.result) return <ResultView p={p} onExit={onExit} />;
   const remaining = 3 - prior.length,
     max = POINTS[Math.min(prior.length, 2)];
@@ -383,7 +409,15 @@ function StudentApp({
         <span className="case-id">
           CASE {s.id} · SUBJECT <b>{p.student.displayName}</b>
         </span>
-        <button onClick={onExit}>Exit room</button>
+        <div className="test-controls">
+          <button onClick={previousQuestion} disabled={p.currentQuestion === 0}>
+            ← Previous question
+          </button>
+          <button className="danger" onClick={resetForTesting} disabled={busy}>
+            Reset quiz
+          </button>
+          <button onClick={onExit}>Exit room</button>
+        </div>
       </div>
       <section className="roomhead">
         <div className="room-copy">
