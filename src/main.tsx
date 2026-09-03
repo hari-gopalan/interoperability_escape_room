@@ -6,6 +6,7 @@ import "./scene.css";
 import "./radiology-celebration.css";
 import "./fullscreen-room.css";
 import "./audio.css";
+import "./login-story.css";
 import "./reduced-motion.css";
 import { INSTRUCTOR_PIN, POLL_INTERVAL_MS } from "./config";
 import { allQuestions, competencies, scenarios } from "./data/scenarios";
@@ -109,85 +110,104 @@ function Login({
   }
   return (
     <Shell>
-      <section className="hero">
-        <p className="eyebrow">Scenario assessment</p>
-        <h1>
-          Protect the meaning,
-          <br />
-          not only the message.
-        </h1>
-        <p>
-          Investigate five stages of an imaging interoperability project. Follow
-          the information, validate the workflow and make the safest next
-          decision.
-        </p>
-      </section>
-      <section className="login card">
-        <div className="seg">
-          <button
-            className={mode === "student" ? "active" : ""}
-            onClick={() => setMode("student")}
-          >
-            Student sign up / login
-          </button>
-          <button
-            className={mode === "instructor" ? "active" : ""}
-            onClick={() => setMode("instructor")}
-          >
-            Instructor login
-          </button>
-        </div>
-        <form onSubmit={go}>
-          <h2>
-            {mode === "student"
-              ? "Enter the incident room"
-              : "Instructor access"}
-          </h2>
-          {mode === "student" && (
-            <>
-              <p className="muted">
-                First visit: enter your name and choose a PIN. Returning
-                students must use the same name and PIN to restore progress.
-              </p>
-              <label>
-                Student name
-                <input
-                  required
-                  value={u}
-                  onChange={(e) => setU(e.target.value)}
-                  autoComplete="name"
-                  placeholder="Your full name"
-                />
-              </label>
-            </>
-          )}
-          <label>
-            {mode === "student" ? "PIN" : "Instructor PIN"}
-            <input
-              required
-              type="password"
-              value={p}
-              onChange={(e) => setP(e.target.value)}
-              autoComplete={
-                mode === "student" ? "new-password" : "current-password"
-              }
-              placeholder={mode === "student" ? "Choose or enter your PIN" : ""}
-            />
-          </label>
-          {msg && (
-            <p className="error" role="alert">
-              {msg}
+      <div className="login-layout">
+        <section className="hero">
+          <div className="incident-ticket">
+            <span>ACTIVE INCIDENT</span>
+            <b>PACS-INT-05</b>
+            <small>TRAINING ENVIRONMENT</small>
+          </div>
+          <p className="eyebrow">Scenario assessment</p>
+          <h1>
+            Protect the meaning,
+            <br />
+            not only the message.
+          </h1>
+          <div className="mission-brief">
+            <span>YOUR ROLE</span>
+            <h2>You are the PACS Administrator.</h2>
+            <p>
+              Your hospital is preparing a major imaging project. You have been
+              asked to guide the team from procurement and workflow design
+              through clinical validation and incident investigation.
             </p>
-          )}
-          <button className="primary" disabled={busy}>
-            {busy
-              ? "Checking…"
-              : mode === "student"
-                ? "Continue"
-                : "Enter control room"}
-          </button>
-        </form>
-      </section>
+            <p>
+              In each room, examine the available evidence, decide which
+              standard or information should be checked, and protect the
+              connection between the patient, the imaging order and the acquired
+              study. Clear all five rooms to release the project safely.
+            </p>
+          </div>
+        </section>
+        <section className="login card">
+          <div className="seg">
+            <button
+              className={mode === "student" ? "active" : ""}
+              onClick={() => setMode("student")}
+            >
+              Student sign up / login
+            </button>
+            <button
+              className={mode === "instructor" ? "active" : ""}
+              onClick={() => setMode("instructor")}
+            >
+              Instructor login
+            </button>
+          </div>
+          <form onSubmit={go}>
+            <h2>
+              {mode === "student"
+                ? "Enter the incident room"
+                : "Instructor access"}
+            </h2>
+            {mode === "student" && (
+              <>
+                <p className="muted">
+                  First visit: enter your name and choose a PIN. Returning
+                  students must use the same name and PIN to restore progress.
+                </p>
+                <label>
+                  Student name
+                  <input
+                    required
+                    value={u}
+                    onChange={(e) => setU(e.target.value)}
+                    autoComplete="name"
+                    placeholder="Your full name"
+                  />
+                </label>
+              </>
+            )}
+            <label>
+              {mode === "student" ? "PIN" : "Instructor PIN"}
+              <input
+                required
+                type="password"
+                value={p}
+                onChange={(e) => setP(e.target.value)}
+                autoComplete={
+                  mode === "student" ? "new-password" : "current-password"
+                }
+                placeholder={
+                  mode === "student" ? "Choose or enter your PIN" : ""
+                }
+              />
+            </label>
+            {msg && (
+              <p className="error" role="alert">
+                {msg}
+              </p>
+            )}
+            <button className="primary" disabled={busy}>
+              {busy
+                ? "Checking…"
+                : mode === "student"
+                  ? "Continue"
+                  : "Enter control room"}
+            </button>
+          </form>
+        </section>
+      </div>
     </Shell>
   );
 }

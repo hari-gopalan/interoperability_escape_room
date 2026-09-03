@@ -4,9 +4,9 @@
   z-index: -3;
   inset: 78px 0 0;
   background:
-    linear-gradient(rgba(239, 247, 243, 0.9), rgba(239, 247, 243, 0.96)),
+    linear-gradient(rgba(239, 247, 243, 0.52), rgba(239, 247, 243, 0.66)),
     url("./assets/radiology-control-room.png") center/cover fixed;
-  filter: saturate(0.8);
+  filter: saturate(0.96) contrast(1.04);
 }
 .escape-scene {
   min-height: 600px;
