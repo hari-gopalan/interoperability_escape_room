@@ -1,0 +1,179 @@
+.login-layout::before {
+  content: "";
+  position: fixed;
+  z-index: -2;
+  inset: 78px 0 0;
+  background:
+    linear-gradient(rgba(1, 12, 8, 0.18), rgba(1, 10, 7, 0.4)),
+    url("./assets/rooms/pacs-monitor-wall.png") center / cover no-repeat;
+}
+
+.login-layout::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 78px 0 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 3px,
+    rgba(137, 255, 207, 0.1) 4px
+  );
+  mix-blend-mode: screen;
+}
+
+.login-layout .hero,
+.login-layout .login.card {
+  border: 10px solid #101916;
+  border-bottom-width: 18px;
+  border-radius: 12px;
+  background: rgba(232, 246, 239, 0.88);
+  box-shadow:
+    0 0 0 1px #46715f,
+    0 24px 55px rgba(0, 0, 0, 0.62),
+    inset 0 0 45px rgba(57, 128, 95, 0.08);
+}
+
+.login-layout .hero::after,
+.login-layout .login.card::after {
+  content: "PACS CONSOLE · LINK ACTIVE";
+  position: absolute;
+  left: 50%;
+  bottom: -15px;
+  transform: translateX(-50%);
+  color: #72d8aa;
+  font:
+    700 0.48rem ui-monospace,
+    monospace;
+  letter-spacing: 0.13em;
+  white-space: nowrap;
+}
+
+.login-layout .login.card {
+  position: relative;
+}
+
+.escape-scene.room-theme-1 {
+  background-image: url("./assets/rooms/room-1-procurement.png");
+}
+.escape-scene.room-theme-2 {
+  background-image: url("./assets/rooms/room-2-workflow.png");
+}
+.escape-scene.room-theme-3 {
+  background-image: url("./assets/rooms/room-3-validation.png");
+}
+.escape-scene.room-theme-4 {
+  background-image: url("./assets/rooms/room-4-investigation.png");
+}
+.escape-scene.room-theme-5 {
+  background-image: url("./assets/rooms/room-5-release.png");
+}
+
+.escape-scene[class*="room-theme-"] {
+  background-size: cover;
+  background-position: center;
+  isolation: isolate;
+}
+
+.escape-scene[class*="room-theme-"]::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(1, 9, 6, 0.08) 0%,
+    rgba(1, 9, 6, 0.06) 48%,
+    rgba(1, 10, 6, 0.72) 82%,
+    rgba(1, 8, 5, 0.9) 100%
+  );
+  pointer-events: none;
+}
+
+.escape-scene .scene-ceiling,
+.escape-scene .pacs-wall,
+.escape-scene .scene-floor {
+  display: none;
+}
+
+.escape-scene .scene-title {
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(124, 218, 176, 0.36);
+  border-radius: 10px;
+  background: rgba(2, 20, 13, 0.76);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(12px);
+}
+
+.escape-scene.scenario-B {
+  --scenario-glow: #78b7ff;
+}
+.escape-scene.scenario-C {
+  --scenario-glow: #d5edff;
+}
+.escape-scene.scenario-D {
+  --scenario-glow: #7fe0d0;
+}
+.escape-scene.scenario-E {
+  --scenario-glow: #d3b777;
+}
+.escape-scene[class*="scenario-"] .active-object {
+  border-color: var(--scenario-glow, #8ce1b9);
+  box-shadow:
+    0 0 0 1px var(--scenario-glow, #4ea77e),
+    0 0 35px color-mix(in srgb, var(--scenario-glow, #8ce1b9) 34%, transparent),
+    0 18px 40px #000;
+}
+
+@keyframes pacs-screen-flicker {
+  0%,
+  91%,
+  94%,
+  100% {
+    filter: brightness(1);
+  }
+  92% {
+    filter: brightness(0.62) contrast(1.25);
+  }
+  93% {
+    filter: brightness(1.12);
+  }
+}
+
+@keyframes pacs-wall-scan {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.28;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-layout .hero {
+    animation: pacs-screen-flicker 8.7s steps(1) infinite;
+  }
+  .login-layout .login.card {
+    animation: pacs-screen-flicker 11.3s 1.7s steps(1) infinite;
+  }
+  .login-layout::after {
+    animation: pacs-wall-scan 4s ease-in-out infinite;
+  }
+  .escape-scene .scene-noise {
+    animation: pacs-screen-flicker 9s steps(1) infinite;
+  }
+}
+
+@media (max-width: 900px) {
+  .login-layout::before,
+  .login-layout::after {
+    position: absolute;
+  }
+  .login-layout {
+    padding-block: 1rem 2rem;
+  }
+}

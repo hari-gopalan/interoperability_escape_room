@@ -7,6 +7,7 @@ import "./radiology-celebration.css";
 import "./fullscreen-room.css";
 import "./audio.css";
 import "./login-story.css";
+import "./stage-graphics.css";
 import "./reduced-motion.css";
 import { INSTRUCTOR_PIN, POLL_INTERVAL_MS } from "./config";
 import { allQuestions, competencies, scenarios } from "./data/scenarios";
@@ -222,15 +223,19 @@ const roomObjects = [
 function RoomScene({
   roomNumber,
   questionNumber,
+  scenarioId,
   onOpen,
 }: {
   roomNumber: number;
   questionNumber: number;
+  scenarioId: ScenarioId;
   onOpen: () => void;
 }) {
   const active = (questionNumber - 1) % 3;
   return (
-    <section className={`escape-scene room-theme-${roomNumber}`}>
+    <section
+      className={`escape-scene room-theme-${roomNumber} scenario-${scenarioId}`}
+    >
       <div className="scene-noise" />
       <div className="scene-ceiling">
         <i />
@@ -520,6 +525,7 @@ function StudentApp({
       <RoomScene
         roomNumber={room.number}
         questionNumber={q.number}
+        scenarioId={p.student.scenarioId}
         onOpen={() => setSceneOpen(true)}
       />
       {sceneOpen ? (
