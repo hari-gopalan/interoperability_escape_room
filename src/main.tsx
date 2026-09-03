@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./styles.css";
 import "./incident-room.css";
 import "./scene.css";
+import "./radiology-celebration.css";
 import "./reduced-motion.css";
 import { INSTRUCTOR_PIN, POLL_INTERVAL_MS } from "./config";
 import { allQuestions, competencies, scenarios } from "./data/scenarios";
@@ -25,11 +26,6 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="app-shell">
       <div className="ambient-grid" aria-hidden="true" />
-      <div className="scan-orbit" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-      </div>
       <header>
         <div className="brand">
           <span className="mark">
@@ -260,6 +256,59 @@ function RoomScene({
     </section>
   );
 }
+function UnlockModal({
+  question,
+  attempt,
+  onContinue,
+}: {
+  question: Question;
+  attempt: Attempt;
+  onContinue: () => void;
+}) {
+  return (
+    <div
+      className="unlock-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="unlock-title"
+    >
+      <div className="celebration" aria-hidden="true">
+        {Array.from({ length: 18 }, (_, i) => (
+          <i key={i} />
+        ))}
+      </div>
+      <section className="unlock-modal">
+        <div className="lock-stage" aria-hidden="true">
+          <div className="shackle" />
+          <div className="lock-body">
+            <span>✓</span>
+          </div>
+          <div className="unlock-wave" />
+        </div>
+        <p className="eyebrow">EVIDENCE VERIFIED</p>
+        <h2 id="unlock-title">Lock released</h2>
+        <p className="points-award">
+          +{attempt.pointsEarnedWhenCompleted.toFixed(2)} POINTS
+        </p>
+        <div className="explanation-panel">
+          <b>Correct answer: {question.correctOptionId}</b>
+          <p>
+            {
+              question.options.find((o) => o.id === question.correctOptionId)
+                ?.text
+            }
+          </p>
+          <p>{question.explanation}</p>
+        </div>
+        <button className="primary unlock-next" onClick={onContinue}>
+          {question.number === 15
+            ? "OPEN FINAL EXIT"
+            : "CONTINUE INVESTIGATION"}
+        </button>
+      </section>
+    </div>
+  );
+}
 function StudentApp({
   initial,
   onExit,
@@ -388,86 +437,104 @@ function StudentApp({
         questionNumber={q.number}
         onOpen={() => setSceneOpen(true)}
       />
-      {sceneOpen ? <section className={`question card evidence investigation-panel ${done ? "resolved" : ""}`}>
-        <button className="close-investigation" onClick={() => setSceneOpen(false)} aria-label="Return to room">×</button>
-        <div className="evidence-tab">EVIDENCE FILE · {q.id}</div>
-        <div className="qmeta">
-          <span>NODE {q.number} / 15</span>
-          <span>TRIES {done ? 0 : remaining}</span>
-          <span>VALUE {done ? "0.00" : max.toFixed(2)}</span>
-        </div>
-        <p className="context">{q.context}</p>
-        <h2>{q.prompt}</h2>
-        <fieldset disabled={busy || !!done}>
-          {q.options.map((o) => {
-            const used = prior.some((a) => a.selectedOption === o.id);
-            return (
-              <label
-                className={`option ${selected === o.id ? "chosen" : ""} ${used ? "used" : ""}`}
-                key={o.id}
-              >
-                <input
-                  type="radio"
-                  name="answer"
-                  checked={selected === o.id}
-                  disabled={used}
-                  onChange={() => setSelected(o.id)}
-                />
-                <b>{o.id}</b>
-                <span>{o.text}</span>
-                {used && <small>Rejected</small>}
-              </label>
-            );
-          })}
-        </fieldset>
-        {msg && (
-          <p className="error" role="alert">
-            {msg}
-          </p>
-        )}
-        {!done && prior.length > 0 && (
-          <aside className="feedback">
-            <b>
-              ACCESS DENIED · {remaining} attempt{remaining === 1 ? "" : "s"}{" "}
-              remaining · Maximum {max.toFixed(2)}
-            </b>
-            <p>
-              {prior.length === 1
-                ? q.hintAfterFirstWrong
-                : q.hintAfterSecondWrong}
+      {sceneOpen ? (
+        <section
+          className={`question card evidence investigation-panel ${done ? "resolved" : ""}`}
+        >
+          <button
+            className="close-investigation"
+            onClick={() => setSceneOpen(false)}
+            aria-label="Return to room"
+          >
+            ×
+          </button>
+          <div className="evidence-tab">EVIDENCE FILE · {q.id}</div>
+          <div className="qmeta">
+            <span>NODE {q.number} / 15</span>
+            <span>TRIES {done ? 0 : remaining}</span>
+            <span>VALUE {done ? "0.00" : max.toFixed(2)}</span>
+          </div>
+          <p className="context">{q.context}</p>
+          <h2>{q.prompt}</h2>
+          <fieldset disabled={busy || !!done}>
+            {q.options.map((o) => {
+              const used = prior.some((a) => a.selectedOption === o.id);
+              return (
+                <label
+                  className={`option ${selected === o.id ? "chosen" : ""} ${used ? "used" : ""}`}
+                  key={o.id}
+                >
+                  <input
+                    type="radio"
+                    name="answer"
+                    checked={selected === o.id}
+                    disabled={used}
+                    onChange={() => setSelected(o.id)}
+                  />
+                  <b>{o.id}</b>
+                  <span>{o.text}</span>
+                  {used && <small>Rejected</small>}
+                </label>
+              );
+            })}
+          </fieldset>
+          {msg && (
+            <p className="error" role="alert">
+              {msg}
             </p>
-          </aside>
-        )}
-        {done && (
-          <aside className={done.correct ? "feedback good" : "feedback"}>
-            <b>
-              {done.correct
-                ? `LOCK RELEASED · ${done.pointsEarnedWhenCompleted.toFixed(2)} points`
-                : "LOCK OVERRIDDEN · 0.00 points"}
-            </b>
-            <p>
-              Correct answer: {q.correctOptionId}.{" "}
-              {q.options.find((o) => o.id === q.correctOptionId)?.text}
-            </p>
-            <p>{q.explanation}</p>
-          </aside>
-        )}
-        <div className="actions">
-          {!done ? (
-            <button
-              className="primary unlock"
-              disabled={!selected || busy}
-              onClick={answer}
-            >
-              {busy ? "VALIDATING…" : "VALIDATE ACCESS CODE"}
-            </button>
-          ) : (
-            <button className="primary unlock" onClick={next}>
-              {q.number === 15 ? "OPEN FINAL EXIT" : "ENTER NEXT CHAMBER"}
-            </button>
           )}
+          {!done && prior.length > 0 && (
+            <aside className="feedback">
+              <b>
+                ACCESS DENIED · {remaining} attempt{remaining === 1 ? "" : "s"}{" "}
+                remaining · Maximum {max.toFixed(2)}
+              </b>
+              <p>
+                {prior.length === 1
+                  ? q.hintAfterFirstWrong
+                  : q.hintAfterSecondWrong}
+              </p>
+            </aside>
+          )}
+          {done && !done.correct && (
+            <aside className={done.correct ? "feedback good" : "feedback"}>
+              <b>
+                {done.correct
+                  ? `LOCK RELEASED · ${done.pointsEarnedWhenCompleted.toFixed(2)} points`
+                  : "LOCK OVERRIDDEN · 0.00 points"}
+              </b>
+              <p>
+                Correct answer: {q.correctOptionId}.{" "}
+                {q.options.find((o) => o.id === q.correctOptionId)?.text}
+              </p>
+              <p>{q.explanation}</p>
+            </aside>
+          )}
+          <div className="actions">
+            {!done ? (
+              <button
+                className="primary unlock"
+                disabled={!selected || busy}
+                onClick={answer}
+              >
+                {busy ? "VALIDATING…" : "VALIDATE ACCESS CODE"}
+              </button>
+            ) : !done.correct ? (
+              <button className="primary unlock" onClick={next}>
+                {q.number === 15 ? "OPEN FINAL EXIT" : "ENTER NEXT CHAMBER"}
+              </button>
+            ) : null}
+          </div>
+        </section>
+      ) : (
+        <div className="awaiting-clue">
+          <span>ROOM ACTIVE</span>
+          <b>Find the highlighted evidence station to continue.</b>
         </div>
-      </section> : <div className="awaiting-clue"><span>ROOM ACTIVE</span><b>Find the highlighted evidence station to continue.</b></div>}
+      )}
+      {done?.correct && (
+        <UnlockModal question={q} attempt={done} onContinue={next} />
+      )}
     </Shell>
   );
 }

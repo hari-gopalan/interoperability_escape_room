@@ -1,0 +1,331 @@
+.app-shell:before {
+  content: "";
+  position: fixed;
+  z-index: -3;
+  inset: 78px 0 0;
+  background:
+    linear-gradient(rgba(239, 247, 243, 0.9), rgba(239, 247, 243, 0.96)),
+    url("./assets/radiology-control-room.png") center/cover fixed;
+  filter: saturate(0.8);
+}
+.escape-scene {
+  min-height: 600px;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(3, 14, 10, 0.08),
+      rgba(2, 10, 7, 0.28) 58%,
+      rgba(2, 9, 6, 0.86)
+    ),
+    url("./assets/radiology-control-room.png");
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 32px 75px rgba(3, 23, 15, 0.35),
+    inset 0 0 90px rgba(0, 0, 0, 0.18);
+}
+.escape-scene .scene-ceiling,
+.escape-scene .pacs-wall,
+.escape-scene .scene-floor {
+  display: none;
+}
+.escape-scene .scene-title {
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  background: rgba(3, 20, 13, 0.72);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(142, 225, 187, 0.25);
+}
+.escape-scene .object-row {
+  bottom: 5%;
+}
+.hotspot {
+  backdrop-filter: blur(14px);
+  background: linear-gradient(
+    145deg,
+    rgba(15, 53, 38, 0.88),
+    rgba(3, 17, 11, 0.92)
+  );
+}
+.unlock-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(3, 15, 10, 0.72);
+  backdrop-filter: blur(12px);
+  animation: modal-fade 0.3s ease;
+}
+.unlock-modal {
+  position: relative;
+  width: min(560px, 95vw);
+  max-height: 92vh;
+  overflow: auto;
+  text-align: center;
+  background: linear-gradient(160deg, #fff, #edf8f2);
+  border: 1px solid #8fd1b2;
+  border-radius: 24px;
+  padding: 2rem clamp(1.25rem, 5vw, 3rem) 2.4rem;
+  box-shadow:
+    0 34px 100px rgba(0, 0, 0, 0.52),
+    0 0 0 8px rgba(116, 221, 171, 0.08);
+  animation: modal-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.unlock-modal h2 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin: 0.15em 0;
+  color: #0a402f;
+}
+.lock-stage {
+  position: relative;
+  width: 112px;
+  height: 126px;
+  margin: 0 auto 1.3rem;
+}
+.shackle {
+  position: absolute;
+  z-index: 1;
+  left: 28px;
+  top: 2px;
+  width: 58px;
+  height: 70px;
+  border: 12px solid #1b6a4f;
+  border-bottom: 0;
+  border-radius: 32px 32px 0 0;
+  transform-origin: 12px 58px;
+  animation: shackle-open 0.9s 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.lock-body {
+  position: absolute;
+  z-index: 2;
+  left: 11px;
+  bottom: 0;
+  width: 92px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #0d7956, #06452f);
+  box-shadow: 0 12px 25px rgba(7, 76, 52, 0.3);
+}
+.lock-body span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #075139;
+  background: #bdf3d8;
+  font-size: 1.5rem;
+  animation: check-pop 0.5s 1s both;
+}
+.unlock-wave {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 53%;
+  width: 90px;
+  height: 90px;
+  border: 2px solid #46b786;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: unlock-wave 1.4s 0.8s ease-out infinite;
+}
+.points-award {
+  display: inline-block;
+  margin: 0.3rem 0 1.2rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 30px;
+  background: #d8f3e5;
+  color: #086044;
+  font: 800 0.75rem ui-monospace;
+  letter-spacing: 0.12em;
+}
+.explanation-panel {
+  text-align: left;
+  padding: 1.15rem 1.25rem;
+  margin: 0 0 1.5rem;
+  border-radius: 13px;
+  border: 1px solid #c5dfd2;
+  background: rgba(255, 255, 255, 0.8);
+  line-height: 1.55;
+}
+.explanation-panel b {
+  color: #075c42;
+}
+.unlock-next {
+  width: 100%;
+  padding: 1rem;
+}
+.celebration {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.celebration i {
+  --x: 50%;
+  --d: 0s;
+  position: absolute;
+  left: var(--x);
+  top: 45%;
+  width: 8px;
+  height: 18px;
+  border-radius: 3px;
+  background: #7ce0b2;
+  animation: confetti 1.8s var(--d) cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.celebration i:nth-child(3n) {
+  background: #f3c96a;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+.celebration i:nth-child(3n + 1) {
+  background: #fff;
+}
+.celebration i:nth-child(1) {
+  --x: 12%;
+  --d: 0.05s;
+}
+.celebration i:nth-child(2) {
+  --x: 18%;
+  --d: 0.18s;
+}
+.celebration i:nth-child(3) {
+  --x: 24%;
+  --d: 0.08s;
+}
+.celebration i:nth-child(4) {
+  --x: 31%;
+  --d: 0.25s;
+}
+.celebration i:nth-child(5) {
+  --x: 37%;
+  --d: 0.12s;
+}
+.celebration i:nth-child(6) {
+  --x: 43%;
+  --d: 0.3s;
+}
+.celebration i:nth-child(7) {
+  --x: 48%;
+  --d: 0.02s;
+}
+.celebration i:nth-child(8) {
+  --x: 53%;
+  --d: 0.2s;
+}
+.celebration i:nth-child(9) {
+  --x: 58%;
+  --d: 0.1s;
+}
+.celebration i:nth-child(10) {
+  --x: 63%;
+  --d: 0.27s;
+}
+.celebration i:nth-child(11) {
+  --x: 68%;
+  --d: 0.06s;
+}
+.celebration i:nth-child(12) {
+  --x: 73%;
+  --d: 0.32s;
+}
+.celebration i:nth-child(13) {
+  --x: 78%;
+  --d: 0.14s;
+}
+.celebration i:nth-child(14) {
+  --x: 84%;
+  --d: 0.23s;
+}
+.celebration i:nth-child(15) {
+  --x: 89%;
+  --d: 0.04s;
+}
+.celebration i:nth-child(16) {
+  --x: 28%;
+  --d: 0.36s;
+}
+.celebration i:nth-child(17) {
+  --x: 71%;
+  --d: 0.38s;
+}
+.celebration i:nth-child(18) {
+  --x: 50%;
+  --d: 0.31s;
+}
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes modal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(35px) scale(0.92);
+  }
+}
+@keyframes shackle-open {
+  0% {
+    transform: none;
+  }
+  55% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translate(-15px, -18px) rotate(-32deg);
+  }
+}
+@keyframes check-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.2) rotate(-25deg);
+  }
+  70% {
+    transform: scale(1.18);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes unlock-wave {
+  from {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.55);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.8);
+  }
+}
+@keyframes confetti {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--x) - 50%) * 1.2), 55vh) rotate(620deg);
+  }
+}
+@media (max-width: 800px) {
+  .escape-scene {
+    min-height: 580px;
+    background-position: 58% center;
+  }
+  .unlock-modal {
+    padding-top: 1.4rem;
+  }
+  .lock-stage {
+    transform: scale(0.8);
+    margin-bottom: 0.4rem;
+  }
+}
