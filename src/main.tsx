@@ -23,9 +23,15 @@ const attemptsFor = (p: Progress, q: Question) =>
   p.attempts.filter((a) => a.questionId === q.id);
 const outcome = (p: Progress, q: Question) =>
   attemptsFor(p, q).find((a) => a.questionCompleted);
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({
+  children,
+  immersive = false,
+}: {
+  children: React.ReactNode;
+  immersive?: boolean;
+}) {
   return (
-    <div className="app-shell">
+    <div className={`app-shell${immersive ? " immersive" : ""}`}>
       <div className="ambient-grid" aria-hidden="true" />
       <header>
         <div className="brand">
@@ -404,7 +410,7 @@ function StudentApp({
   const remaining = 3 - prior.length,
     max = POINTS[Math.min(prior.length, 2)];
   return (
-    <Shell>
+    <Shell immersive>
       <div className="studentbar">
         <span className="case-id">
           CASE {s.id} · SUBJECT <b>{p.student.displayName}</b>
@@ -472,94 +478,104 @@ function StudentApp({
         onOpen={() => setSceneOpen(true)}
       />
       {sceneOpen ? (
-        <section
-          className={`question card evidence investigation-panel ${done ? "resolved" : ""}`}
-        >
-          <button
-            className="close-investigation"
-            onClick={() => setSceneOpen(false)}
-            aria-label="Return to room"
+        <div className="question-modal-backdrop" role="presentation">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="current-question"
+            className={`question card evidence investigation-panel ${done ? "resolved" : ""}`}
           >
-            ×
-          </button>
-          <div className="evidence-tab">EVIDENCE FILE · {q.id}</div>
-          <div className="qmeta">
-            <span>NODE {q.number} / 15</span>
-            <span>TRIES {done ? 0 : remaining}</span>
-            <span>VALUE {done ? "0.00" : max.toFixed(2)}</span>
-          </div>
-          <p className="context">{q.context}</p>
-          <h2>{q.prompt}</h2>
-          <fieldset disabled={busy || !!done}>
-            {q.options.map((o) => {
-              const used = prior.some((a) => a.selectedOption === o.id);
-              return (
-                <label
-                  className={`option ${selected === o.id ? "chosen" : ""} ${used ? "used" : ""}`}
-                  key={o.id}
+            <button
+              className="close-investigation"
+              onClick={() => setSceneOpen(false)}
+              aria-label="Return to room"
+            >
+              ×
+            </button>
+            <div className="evidence-tab">EVIDENCE FILE · {q.id}</div>
+            <div className="qmeta">
+              <span>NODE {q.number} / 15</span>
+              <span>TRIES {done ? 0 : remaining}</span>
+              <span>VALUE {done ? "0.00" : max.toFixed(2)}</span>
+            </div>
+            <div className="story-briefing">
+              <span>CASE UPDATE</span>
+              <p>{q.storyBeat}</p>
+            </div>
+            <p className="context">{q.context}</p>
+            <h2 id="current-question">{q.prompt}</h2>
+            <fieldset disabled={busy || !!done}>
+              {q.options.map((o) => {
+                const used = prior.some((a) => a.selectedOption === o.id);
+                return (
+                  <label
+                    className={`option ${selected === o.id ? "chosen" : ""} ${used ? "used" : ""}`}
+                    key={o.id}
+                  >
+                    <input
+                      type="radio"
+                      name="answer"
+                      checked={selected === o.id}
+                      disabled={used}
+                      onChange={() => setSelected(o.id)}
+                    />
+                    <b>{o.id}</b>
+                    <span>{o.text}</span>
+                    {used && <small>Rejected</small>}
+                  </label>
+                );
+              })}
+            </fieldset>
+            {msg && (
+              <p className="error" role="alert">
+                {msg}
+              </p>
+            )}
+            {!done && prior.length > 0 && (
+              <aside className="feedback">
+                <b>
+                  ACCESS DENIED · {remaining} attempt
+                  {remaining === 1 ? "" : "s"} remaining · Maximum{" "}
+                  {max.toFixed(2)}
+                </b>
+                <p>
+                  {prior.length === 1
+                    ? q.hintAfterFirstWrong
+                    : q.hintAfterSecondWrong}
+                </p>
+              </aside>
+            )}
+            {done && !done.correct && (
+              <aside className={done.correct ? "feedback good" : "feedback"}>
+                <b>
+                  {done.correct
+                    ? `LOCK RELEASED · ${done.pointsEarnedWhenCompleted.toFixed(2)} points`
+                    : "LOCK OVERRIDDEN · 0.00 points"}
+                </b>
+                <p>
+                  Correct answer: {q.correctOptionId}.{" "}
+                  {q.options.find((o) => o.id === q.correctOptionId)?.text}
+                </p>
+                <p>{q.explanation}</p>
+              </aside>
+            )}
+            <div className="actions">
+              {!done ? (
+                <button
+                  className="primary unlock"
+                  disabled={!selected || busy}
+                  onClick={answer}
                 >
-                  <input
-                    type="radio"
-                    name="answer"
-                    checked={selected === o.id}
-                    disabled={used}
-                    onChange={() => setSelected(o.id)}
-                  />
-                  <b>{o.id}</b>
-                  <span>{o.text}</span>
-                  {used && <small>Rejected</small>}
-                </label>
-              );
-            })}
-          </fieldset>
-          {msg && (
-            <p className="error" role="alert">
-              {msg}
-            </p>
-          )}
-          {!done && prior.length > 0 && (
-            <aside className="feedback">
-              <b>
-                ACCESS DENIED · {remaining} attempt{remaining === 1 ? "" : "s"}{" "}
-                remaining · Maximum {max.toFixed(2)}
-              </b>
-              <p>
-                {prior.length === 1
-                  ? q.hintAfterFirstWrong
-                  : q.hintAfterSecondWrong}
-              </p>
-            </aside>
-          )}
-          {done && !done.correct && (
-            <aside className={done.correct ? "feedback good" : "feedback"}>
-              <b>
-                {done.correct
-                  ? `LOCK RELEASED · ${done.pointsEarnedWhenCompleted.toFixed(2)} points`
-                  : "LOCK OVERRIDDEN · 0.00 points"}
-              </b>
-              <p>
-                Correct answer: {q.correctOptionId}.{" "}
-                {q.options.find((o) => o.id === q.correctOptionId)?.text}
-              </p>
-              <p>{q.explanation}</p>
-            </aside>
-          )}
-          <div className="actions">
-            {!done ? (
-              <button
-                className="primary unlock"
-                disabled={!selected || busy}
-                onClick={answer}
-              >
-                {busy ? "VALIDATING…" : "VALIDATE ACCESS CODE"}
-              </button>
-            ) : !done.correct ? (
-              <button className="primary unlock" onClick={next}>
-                {q.number === 15 ? "OPEN FINAL EXIT" : "ENTER NEXT CHAMBER"}
-              </button>
-            ) : null}
-          </div>
-        </section>
+                  {busy ? "VALIDATING…" : "VALIDATE ACCESS CODE"}
+                </button>
+              ) : !done.correct ? (
+                <button className="primary unlock" onClick={next}>
+                  {q.number === 15 ? "OPEN FINAL EXIT" : "ENTER NEXT CHAMBER"}
+                </button>
+              ) : null}
+            </div>
+          </section>
+        </div>
       ) : (
         <div className="awaiting-clue">
           <span>ROOM ACTIVE</span>

@@ -1,10 +1,10 @@
-.app-shell:has(.escape-scene) main {
+.app-shell.immersive main {
   width: 100%;
   max-width: none;
   padding: 0;
   position: relative;
 }
-.app-shell:has(.escape-scene) .studentbar {
+.app-shell.immersive .studentbar {
   position: absolute;
   z-index: 20;
   left: clamp(1rem, 3vw, 3rem);
@@ -27,10 +27,10 @@
   padding: 0.55rem 0.75rem;
   background: rgba(244, 251, 247, 0.92);
 }
-.app-shell:has(.escape-scene) .roomhead {
+.app-shell.immersive .roomhead {
   display: none;
 }
-.app-shell:has(.escape-scene) .escape-scene {
+.app-shell.immersive .escape-scene {
   width: 100%;
   height: calc(100vh - 78px);
   min-height: 650px;
@@ -40,7 +40,7 @@
   background-position: center;
   box-shadow: inset 0 0 130px rgba(0, 0, 0, 0.35);
 }
-.app-shell:has(.escape-scene) .escape-scene:after {
+.app-shell.immersive .escape-scene:after {
   content: "";
   position: absolute;
   inset: 0;
@@ -52,12 +52,12 @@
   );
   pointer-events: none;
 }
-.app-shell:has(.escape-scene) .scene-title {
+.app-shell.immersive .scene-title {
   top: 17%;
   left: 3%;
   z-index: 4;
 }
-.app-shell:has(.escape-scene) .object-row {
+.app-shell.immersive .object-row {
   z-index: 5;
   left: 3%;
   right: 3%;
@@ -65,7 +65,7 @@
   max-width: 1000px;
   margin: auto;
 }
-.app-shell:has(.escape-scene) .scene-instruction {
+.app-shell.immersive .scene-instruction {
   z-index: 5;
   top: 19%;
   right: 3%;
@@ -74,7 +74,7 @@
   border-radius: 8px;
   backdrop-filter: blur(10px);
 }
-.app-shell:has(.escape-scene) .corridor {
+.app-shell.immersive .corridor {
   position: absolute;
   z-index: 21;
   top: 6.2rem;
@@ -82,17 +82,17 @@
   width: min(560px, 58vw);
   margin: 0;
 }
-.app-shell:has(.escape-scene) .corridor div {
+.app-shell.immersive .corridor div {
   background: rgba(4, 24, 16, 0.72);
   border-color: rgba(150, 218, 187, 0.32);
   color: #a5c8b7;
   backdrop-filter: blur(10px);
 }
-.app-shell:has(.escape-scene) .corridor .now {
+.app-shell.immersive .corridor .now {
   background: #0a6b4c;
   color: #fff;
 }
-.app-shell:has(.escape-scene) .awaiting-clue {
+.app-shell.immersive .awaiting-clue {
   position: absolute;
   z-index: 6;
   bottom: 1rem;
@@ -100,20 +100,25 @@
   transform: translateX(-50%);
   color: #d7e9df;
 }
+.question-modal-backdrop {
+  position: fixed;
+  z-index: 79;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(2, 13, 8, 0.78);
+  backdrop-filter: blur(10px);
+}
 .investigation-panel {
-  position: fixed !important;
+  position: relative !important;
   z-index: 80 !important;
-  left: 50%;
-  top: 50%;
   width: min(820px, calc(100vw - 2rem));
-  max-height: 88vh;
+  max-height: min(88vh, 850px);
   overflow: auto;
   margin: 0 !important;
-  transform: translate(-50%, -50%) !important;
   border-radius: 22px !important;
-  box-shadow:
-    0 0 0 100vmax rgba(2, 13, 8, 0.76),
-    0 35px 90px rgba(0, 0, 0, 0.52) !important;
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.52) !important;
   animation: question-modal-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .investigation-panel .close-investigation {
@@ -129,22 +134,43 @@
 .investigation-panel h2 {
   font-size: clamp(1.35rem, 2.5vw, 2rem);
 }
+.story-briefing {
+  margin: 0.25rem 0 1.25rem;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid #1b9168;
+  border-radius: 0 10px 10px 0;
+  background: #edf7f2;
+  color: #334b40;
+}
+.story-briefing span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #08704f;
+  font:
+    800 0.62rem ui-monospace,
+    monospace;
+  letter-spacing: 0.14em;
+}
+.story-briefing p {
+  margin: 0;
+  line-height: 1.55;
+}
 @keyframes question-modal-in {
   from {
     opacity: 0;
-    transform: translate(-50%, -46%) scale(0.94);
+    transform: translateY(28px) scale(0.94);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: none;
   }
 }
 @media (max-width: 760px) {
-  .app-shell:has(.escape-scene) .escape-scene {
+  .app-shell.immersive .escape-scene {
     height: calc(100svh - 72px);
     min-height: 660px;
   }
-  .app-shell:has(.escape-scene) .studentbar {
+  .app-shell.immersive .studentbar {
     align-items: center;
     top: 0.7rem;
   }
@@ -158,17 +184,17 @@
   .test-controls button {
     font-size: 0.68rem;
   }
-  .app-shell:has(.escape-scene) .corridor {
+  .app-shell.immersive .corridor {
     top: 4.8rem;
     left: 1rem;
     right: 1rem;
     width: auto;
   }
-  .app-shell:has(.escape-scene) .scene-title {
+  .app-shell.immersive .scene-title {
     top: 15%;
     left: 1rem;
   }
-  .app-shell:has(.escape-scene) .object-row {
+  .app-shell.immersive .object-row {
     left: 1rem;
     right: 1rem;
   }
