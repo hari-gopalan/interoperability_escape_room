@@ -5,7 +5,7 @@
   inset: 78px 0 0;
   background:
     linear-gradient(rgba(239, 247, 243, 0.52), rgba(239, 247, 243, 0.66)),
-    url("./assets/radiology-control-room.png") center/cover fixed;
+    url("./assets/rooms/room-3-validation.jpg") center/cover fixed;
   filter: saturate(0.96) contrast(1.04);
 }
 .escape-scene {
@@ -17,7 +17,7 @@
       rgba(2, 10, 7, 0.28) 58%,
       rgba(2, 9, 6, 0.86)
     ),
-    url("./assets/radiology-control-room.png");
+    url("./assets/rooms/room-3-validation.jpg");
   background-size: cover;
   background-position: center;
   box-shadow:

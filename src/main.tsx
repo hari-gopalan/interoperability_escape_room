@@ -403,16 +403,15 @@ function StudentApp({
       pointsEarnedWhenCompleted: points,
     };
     const next = { ...p, attempts: [...p.attempts, a] };
-    try {
-      await api.saveAttempt(a, next);
-      playCue(correct ? "correct" : "wrong");
-      setP(next);
-      setSelected("");
-    } catch {
-      setMsg("Your response could not be saved. Please try again.");
-    } finally {
-      setBusy(false);
-    }
+    playCue(correct ? "correct" : "wrong");
+    setP(next);
+    setSelected("");
+    setBusy(false);
+    void api.saveAttempt(a, next).catch(() => {
+      setMsg(
+        "The answer is stored on this device, but cloud sync is delayed. Keep using this browser until the connection is restored.",
+      );
+    });
   }
   async function next() {
     playCue("door");
@@ -729,6 +728,165 @@ function Review({ progress }: { progress: Progress }) {
     </div>
   );
 }
+const demoQuestions = [
+  {
+    room: 1,
+    title: "TRAINING CONSOLE",
+    story:
+      "This practice room is disconnected from the graded assessment. Show students how to inspect a station, choose an answer and validate their choice.",
+    prompt:
+      "Which glowing station should you inspect to begin an escape-room question?",
+    options: [
+      "The station marked EVIDENCE DETECTED",
+      "Any locked station",
+      "The exit button",
+    ],
+    answer: 0,
+    explanation:
+      "The pulsing EVIDENCE DETECTED station opens the question. Locked stations become available later.",
+  },
+  {
+    room: 2,
+    title: "PRACTICE ATTEMPT",
+    story:
+      "A practice lock is open. This example demonstrates answer selection and feedback without using any course question.",
+    prompt: "What should a student do before pressing Validate Access Code?",
+    options: ["Choose one answer", "Reset the whole quiz", "Close the browser"],
+    answer: 0,
+    explanation:
+      "Students choose one option, then validate it. A wrong choice provides a hint and another attempt in the real activity.",
+  },
+  {
+    room: 3,
+    title: "LOCK RELEASE DEMO",
+    story:
+      "The final practice station demonstrates how a successful decision releases a lock and advances the investigation.",
+    prompt: "What happens after a correct answer in the real escape room?",
+    options: [
+      "The lock releases and an explanation appears",
+      "The grade is deleted",
+      "The same screen freezes",
+    ],
+    answer: 0,
+    explanation:
+      "A correct response triggers the release animation, explains the answer and opens the next investigation step.",
+  },
+];
+
+function InstructorSandbox() {
+  const [step, setStep] = useState(0),
+    [open, setOpen] = useState(false),
+    [choice, setChoice] = useState<number | null>(null),
+    [checked, setChecked] = useState(false);
+  const q = demoQuestions[step],
+    correct = checked && choice === q.answer;
+  const restart = () => {
+    setStep(0);
+    setOpen(false);
+    setChoice(null);
+    setChecked(false);
+  };
+  return (
+    <section className="instructor-sandbox">
+      <div className="sandbox-toolbar">
+        <div>
+          <p className="eyebrow">Instructor demonstration sandbox</p>
+          <h2>Student escape-room preview</h2>
+          <p>
+            Three ungraded practice questions. No account or Sheet data is used.
+          </p>
+        </div>
+        <button onClick={restart}>Restart demo</button>
+      </div>
+      <div className="sandbox-room">
+        <RoomScene
+          roomNumber={q.room}
+          questionNumber={1}
+          scenarioId="A"
+          onOpen={() => setOpen(true)}
+        />
+      </div>
+      {open && (
+        <div className="question-modal-backdrop sandbox-modal">
+          <section className="question card evidence investigation-panel">
+            <button
+              className="close-investigation"
+              onClick={() => setOpen(false)}
+              aria-label="Close practice question"
+            >
+              ×
+            </button>
+            <div className="evidence-tab">PRACTICE FILE · DEMO-{step + 1}</div>
+            <div className="story-briefing">
+              <span>DEMONSTRATION UPDATE</span>
+              <p>{q.story}</p>
+            </div>
+            <p className="context">{q.title}</p>
+            <h2>{q.prompt}</h2>
+            <fieldset disabled={correct}>
+              {q.options.map((option, index) => (
+                <label
+                  className={`option ${choice === index ? "chosen" : ""}`}
+                  key={option}
+                >
+                  <input
+                    type="radio"
+                    name="demo-answer"
+                    checked={choice === index}
+                    onChange={() => {
+                      setChoice(index);
+                      setChecked(false);
+                    }}
+                  />
+                  <b>{String.fromCharCode(65 + index)}</b>
+                  <span>{option}</span>
+                </label>
+              ))}
+            </fieldset>
+            {checked && (
+              <aside className={correct ? "feedback good" : "feedback"}>
+                <b>{correct ? "PRACTICE LOCK RELEASED" : "TRY AGAIN"}</b>
+                <p>
+                  {correct
+                    ? q.explanation
+                    : "That option is only a demonstration distractor. Select another answer."}
+                </p>
+              </aside>
+            )}
+            <div className="actions">
+              {!correct ? (
+                <button
+                  className="primary"
+                  disabled={choice === null}
+                  onClick={() => setChecked(true)}
+                >
+                  VALIDATE PRACTICE CODE
+                </button>
+              ) : step < demoQuestions.length - 1 ? (
+                <button
+                  className="primary"
+                  onClick={() => {
+                    setStep(step + 1);
+                    setOpen(false);
+                    setChoice(null);
+                    setChecked(false);
+                  }}
+                >
+                  ENTER NEXT PRACTICE ROOM
+                </button>
+              ) : (
+                <button className="primary" onClick={restart}>
+                  REPLAY DEMONSTRATION
+                </button>
+              )}
+            </div>
+          </section>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function Instructor({ onExit }: { onExit: () => void }) {
   const [data, setData] = useState<{
       students: Student[];
@@ -763,7 +921,13 @@ function Instructor({ onExit }: { onExit: () => void }) {
         <button onClick={onExit}>Sign out</button>
       </div>
       <nav>
-        {["dashboard", "matrix", "class review", "scenario review"].map((t) => (
+        {[
+          "dashboard",
+          "student demo",
+          "matrix",
+          "class review",
+          "scenario review",
+        ].map((t) => (
           <button
             className={tab === t ? "active" : ""}
             onClick={() => setTab(t)}
@@ -798,6 +962,7 @@ function Instructor({ onExit }: { onExit: () => void }) {
           />
         </>
       )}
+      {tab === "student demo" && <InstructorSandbox />}
       {tab === "matrix" && <Matrix data={data} />}{" "}
       {tab === "student" && selectedP && (
         <section className="card">

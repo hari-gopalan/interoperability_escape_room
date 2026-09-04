@@ -5,7 +5,7 @@
   inset: 78px 0 0;
   background:
     linear-gradient(rgba(1, 12, 8, 0.18), rgba(1, 10, 7, 0.4)),
-    url("./assets/rooms/pacs-monitor-wall.png") center / cover no-repeat;
+    url("./assets/rooms/pacs-monitor-wall.jpg") center / cover no-repeat;
 }
 
 .login-layout::after {
@@ -25,6 +25,7 @@
 
 .login-layout .hero,
 .login-layout .login.card {
+  overflow: hidden;
   border: 10px solid #101916;
   border-bottom-width: 18px;
   border-radius: 12px;
@@ -33,6 +34,31 @@
     0 0 0 1px #46715f,
     0 24px 55px rgba(0, 0, 0, 0.62),
     inset 0 0 45px rgba(57, 128, 95, 0.08);
+}
+
+.login-layout .hero::before,
+.login-layout .login.card::before {
+  content: "";
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.34;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0.13),
+      transparent 22% 76%,
+      rgba(115, 255, 196, 0.08)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(2, 21, 14, 0.1) 0,
+      rgba(2, 21, 14, 0.1) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  box-shadow: inset 0 0 42px rgba(3, 35, 23, 0.28);
 }
 
 .login-layout .hero::after,
@@ -48,6 +74,7 @@
     monospace;
   letter-spacing: 0.13em;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 .login-layout .login.card {
@@ -55,19 +82,19 @@
 }
 
 .escape-scene.room-theme-1 {
-  background-image: url("./assets/rooms/room-1-procurement.png");
+  background-image: url("./assets/rooms/room-1-procurement.jpg");
 }
 .escape-scene.room-theme-2 {
-  background-image: url("./assets/rooms/room-2-workflow.png");
+  background-image: url("./assets/rooms/room-2-workflow.jpg");
 }
 .escape-scene.room-theme-3 {
-  background-image: url("./assets/rooms/room-3-validation.png");
+  background-image: url("./assets/rooms/room-3-validation.jpg");
 }
 .escape-scene.room-theme-4 {
-  background-image: url("./assets/rooms/room-4-investigation.png");
+  background-image: url("./assets/rooms/room-4-investigation.jpg");
 }
 .escape-scene.room-theme-5 {
-  background-image: url("./assets/rooms/room-5-release.png");
+  background-image: url("./assets/rooms/room-5-release.jpg");
 }
 
 .escape-scene[class*="room-theme-"] {
@@ -141,6 +168,47 @@
   }
 }
 
+@keyframes monitor-power-on {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.004) scaleX(0.72);
+    filter: brightness(4) blur(2px);
+  }
+  12% {
+    opacity: 1;
+    transform: scaleY(0.012) scaleX(1);
+    filter: brightness(3.2) blur(1px);
+  }
+  28% {
+    transform: scaleY(1) scaleX(1);
+    filter: brightness(1.35);
+  }
+  42% {
+    filter: brightness(0.78);
+  }
+  55%,
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: brightness(1);
+  }
+}
+
+@keyframes monitor-refresh {
+  0% {
+    transform: translateY(-115%);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.55;
+  }
+  30%,
+  100% {
+    transform: translateY(115%);
+    opacity: 0;
+  }
+}
+
 @keyframes pacs-wall-scan {
   0%,
   100% {
@@ -155,10 +223,18 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .login-layout .hero {
-    animation: pacs-screen-flicker 8.7s steps(1) infinite;
+    animation:
+      monitor-power-on 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      pacs-screen-flicker 8.7s 1.2s steps(1) infinite;
   }
   .login-layout .login.card {
-    animation: pacs-screen-flicker 11.3s 1.7s steps(1) infinite;
+    animation:
+      monitor-power-on 1.05s 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      pacs-screen-flicker 11.3s 1.7s steps(1) infinite;
+  }
+  .login-layout .hero::before,
+  .login-layout .login.card::before {
+    animation: monitor-refresh 5.8s 1.4s linear infinite;
   }
   .login-layout::after {
     animation: pacs-wall-scan 4s ease-in-out infinite;
@@ -166,6 +242,115 @@
   .escape-scene .scene-noise {
     animation: pacs-screen-flicker 9s steps(1) infinite;
   }
+}
+
+@media (min-width: 901px) {
+  .login-layout {
+    width: min(66vw, 1180px);
+    min-height: calc(100vh - 78px);
+    margin: 0 auto;
+    padding-top: clamp(13rem, 28vh, 24rem);
+    grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.92fr);
+    align-items: start;
+    gap: clamp(1.5rem, 3.5vw, 4rem);
+  }
+  .login-layout .hero,
+  .login-layout .login.card {
+    height: clamp(315px, 37vh, 455px);
+    padding: clamp(1rem, 1.5vw, 1.5rem);
+    border-width: 12px;
+    border-bottom-width: 20px;
+  }
+  .login-layout .hero {
+    max-width: none;
+    display: grid;
+    grid-template-columns: 0.82fr 1.18fr;
+    grid-template-rows: auto auto 1fr;
+    column-gap: 1.1rem;
+  }
+  .login-layout .incident-ticket {
+    grid-column: 1 / -1;
+    margin-bottom: 0.6rem;
+    padding: 0.48rem 0.65rem;
+  }
+  .login-layout .hero > .eyebrow {
+    grid-column: 1;
+    margin: 0.35rem 0 0;
+  }
+  .login-layout .hero > h1 {
+    grid-column: 1;
+    margin: 0.25rem 0;
+    font-size: clamp(1.8rem, 2.4vw, 3.2rem);
+    line-height: 0.94;
+  }
+  .login-layout .mission-brief {
+    grid-column: 2;
+    grid-row: 2 / 4;
+    align-self: stretch;
+    overflow: auto;
+    margin: 0;
+    padding: 0.85rem 0.95rem;
+  }
+  .login-layout .mission-brief h2 {
+    font-size: 1rem;
+  }
+  .login-layout .mission-brief p {
+    font-size: clamp(0.7rem, 0.75vw, 0.88rem);
+    line-height: 1.4;
+  }
+  .login-layout .login.card {
+    align-self: start;
+    height: auto;
+    min-height: 390px;
+  }
+  .login-layout .login form {
+    padding: clamp(0.8rem, 1.2vw, 1.2rem);
+  }
+  .login-layout .login form h2 {
+    margin: 0 0 0.45rem;
+    font-size: 1.15rem;
+  }
+  .login-layout .login .muted {
+    margin: 0.35rem 0 0.65rem;
+    font-size: 0.73rem;
+    line-height: 1.25;
+  }
+  .login-layout .login label {
+    margin-top: 0.5rem;
+  }
+  .login-layout .login input {
+    padding: 0.62rem 0.7rem;
+  }
+  .login-layout .login .primary {
+    margin-top: 0.6rem;
+    padding: 0.65rem;
+  }
+}
+
+.instructor-sandbox {
+  position: relative;
+}
+.sandbox-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid #c8dbd1;
+  border-radius: 14px;
+  background: rgba(247, 252, 249, 0.92);
+}
+.sandbox-toolbar h2,
+.sandbox-toolbar p {
+  margin: 0.2rem 0;
+}
+.sandbox-room .escape-scene {
+  height: min(68vh, 700px);
+  min-height: 560px;
+}
+.sandbox-modal {
+  z-index: 100;
 }
 
 @media (max-width: 900px) {
