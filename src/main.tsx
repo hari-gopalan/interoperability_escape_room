@@ -8,6 +8,7 @@ import "./fullscreen-room.css";
 import "./audio.css";
 import "./login-story.css";
 import "./stage-graphics.css";
+import "./class-review.css";
 import "./reduced-motion.css";
 import { INSTRUCTOR_PIN, POLL_INTERVAL_MS } from "./config";
 import { allQuestions, competencies, scenarios } from "./data/scenarios";
@@ -468,9 +469,15 @@ function StudentApp({
           <button onClick={previousQuestion} disabled={p.currentQuestion === 0}>
             ← Previous question
           </button>
-          <button className="danger" onClick={resetForTesting} disabled={busy}>
-            Reset quiz
-          </button>
+          {p.student.displayName.trim().toLowerCase() === "hari" && (
+            <button
+              className="danger"
+              onClick={resetForTesting}
+              disabled={busy}
+            >
+              Reset quiz
+            </button>
+          )}
           <button onClick={onExit}>Exit room</button>
         </div>
       </div>
@@ -687,9 +694,11 @@ function ResultView({
           <button className="primary" onClick={() => setReview(!r)}>
             {r ? "Close review" : "Review my incident"}
           </button>
-          <button className="danger" onClick={onReset}>
-            Reset and replay
-          </button>
+          {p.student.displayName.trim().toLowerCase() === "hari" && (
+            <button className="danger" onClick={onReset}>
+              Reset and replay
+            </button>
+          )}
           <button onClick={onExit}>Sign out</button>
         </div>
         {r && <Review progress={p} />}
@@ -1113,6 +1122,24 @@ function Matrix({ data }: { data: any }) {
     </section>
   );
 }
+const genericReviewPrompts = [
+  "Which interoperability standard should be checked first when imaging equipment must exchange images and examination information with PACS?",
+  "If two systems both claim standards compliance, does that guarantee the hospital's complete workflow will operate correctly?",
+  "What is the strongest way to confirm that a vendor's integration will work in the hospital's actual environment?",
+  "How do HL7 and DICOM support different parts of an imaging workflow?",
+  "Which user action creates the greatest patient-safety risk when a scheduled examination cannot be found on the modality worklist?",
+  "What problem occurs when data is transmitted but two systems interpret the procedure differently?",
+  "Which identifiers should be checked together to validate both the patient and imaging order?",
+  "What should staff conclude when some identifiers match but important demographic or examination details conflict?",
+  "What role does ICD play when diagnosis information is exchanged or reported?",
+  "What is the safest conclusion when the hospital record and acquired study contain conflicting patient identities?",
+  "What should staff do before correcting a suspected patient or study error in PACS?",
+  "What response is appropriate when manual examination creation causes an imaging study to be associated incorrectly?",
+  "What must be harmonized before diagnosis-coded information from several sites can become one reliable report?",
+  "Why might FHIR be useful when another application requests selected health information?",
+  "What combination of technical, semantic, workflow and governance practices best supports safe interoperability?",
+];
+
 function ClassReview({
   n,
   setPick,
@@ -1124,70 +1151,143 @@ function ClassReview({
   attempts: Attempt[];
   students: Student[];
 }) {
+  const [excluded, setExcluded] = useState<Set<string>>(new Set());
+  const [reviewFilter, setReviewFilter] = useState<"all" | "wrong" | "correct">(
+    "all",
+  );
+  const included = students.filter((s) => !excluded.has(s.studentId));
+  const metrics = Array.from({ length: 15 }, (_, index) => {
+    let answered = 0;
+    const wrongStudents: Student[] = [];
+    included.forEach((student) => {
+      const questionId = allQuestions(scenario(student.scenarioId))[index].id;
+      const aa = attempts.filter(
+        (a) => a.studentId === student.studentId && a.questionId === questionId,
+      );
+      if (aa.length) answered += 1;
+      if (aa.some((a) => !a.correct)) wrongStudents.push(student);
+    });
+    return {
+      answered,
+      wrongStudents,
+      band: included.length
+        ? Math.round((wrongStudents.length / included.length) * 4)
+        : 0,
+    };
+  });
+  const current = metrics[n - 1],
+    exemplar = allQuestions(scenarios[0])[n - 1];
+  const toggleStudent = (id: string) =>
+    setExcluded((old) => {
+      const next = new Set(old);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   return (
-    <section>
-      <label>
-        Question
-        <select value={n} onChange={(e) => setPick(e.target.value)}>
-          {Array.from({ length: 15 }, (_, i) => (
-            <option key={i}>{i + 1}</option>
+    <section className="class-review">
+      <section className="student-selector card">
+        <div>
+          <p className="eyebrow">Student selector</p>
+          <h2>Include in class analysis</h2>
+          <p>Uncheck your test account or any student you want to exclude.</p>
+        </div>
+        <div className="student-checks">
+          {students.map((student) => (
+            <label key={student.studentId}>
+              <input
+                type="checkbox"
+                checked={!excluded.has(student.studentId)}
+                onChange={() => toggleStudent(student.studentId)}
+              />
+              <span>{student.displayName}</span>
+            </label>
           ))}
-        </select>
-      </label>
-      <div className="variants">
-        {scenarios.map((s) => {
-          const q = allQuestions(s)[n - 1],
-            assigned = students.filter((x) => x.scenarioId === s.id).length,
-            aa = attempts.filter((a) => a.questionId === q.id),
-            done = aa.filter((a) => a.questionCompleted);
-          return (
-            <article className="card" key={s.id}>
-              <p className="eyebrow">
-                Scenario {s.id} · {q.competency}
-              </p>
-              <h2>{s.title}</h2>
-              <p>{q.prompt}</p>
-              <ol type="A">
-                {q.options.map((o) => (
-                  <li
-                    className={o.id === q.correctOptionId ? "correct" : ""}
-                    key={o.id}
-                  >
-                    {o.text}
-                  </li>
-                ))}
-              </ol>
-              <p>
-                <b>Correct: {q.correctOptionId}</b> · {q.explanation}
-              </p>
-              <small>
-                Assigned: {assigned} · First attempt:{" "}
-                {assigned
-                  ? Math.round(
-                      (done.filter((a) => a.correct && a.attemptNumber === 1)
-                        .length /
-                        assigned) *
-                        100,
-                    )
-                  : 0}
-                % · By third:{" "}
-                {assigned
-                  ? Math.round(
-                      (done.filter((a) => a.correct).length / assigned) * 100,
-                    )
-                  : 0}
-                % · Never correct:{" "}
-                {assigned
-                  ? Math.round(
-                      (done.filter((a) => !a.correct).length / assigned) * 100,
-                    )
-                  : 0}
-                %
-              </small>
-            </article>
-          );
-        })}
+        </div>
+      </section>
+      <div className="review-filters">
+        <span>Show questions:</span>
+        {(
+          [
+            ["all", "All"],
+            ["wrong", "Needs review"],
+            ["correct", "All correct"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            className={reviewFilter === value ? "active" : ""}
+            onClick={() => setReviewFilter(value)}
+            key={value}
+          >
+            {label}
+          </button>
+        ))}
       </div>
+      <div className="question-heatmap">
+        {metrics
+          .map((metric, index) => ({ metric, index }))
+          .filter(
+            ({ metric }) =>
+              reviewFilter === "all" ||
+              (reviewFilter === "wrong"
+                ? metric.wrongStudents.length > 0
+                : metric.answered > 0 && metric.wrongStudents.length === 0),
+          )
+          .map(({ metric, index }) => (
+            <button
+              key={index}
+              className={`${n === index + 1 ? "selected" : ""} review-band-${metric.answered ? metric.band : "empty"}`}
+              onClick={() => setPick(String(index + 1))}
+              title={`${metric.wrongStudents.length} of ${included.length} students made a mistake`}
+            >
+              {index + 1}
+              <small>{metric.wrongStudents.length} wrong</small>
+            </button>
+          ))}
+      </div>
+      <article className="class-question card">
+        <p className="eyebrow">
+          Question {n} · {exemplar.competency}
+        </p>
+        <h2>{genericReviewPrompts[n - 1]}</h2>
+        <div className="review-summary">
+          <div>
+            <b>{included.length}</b>
+            <span>students included</span>
+          </div>
+          <div>
+            <b>{current.answered}</b>
+            <span>students answered</span>
+          </div>
+          <div
+            className={
+              current.wrongStudents.length ? "has-errors" : "all-clear"
+            }
+          >
+            <b>{current.wrongStudents.length}</b>
+            <span>students made a mistake</span>
+          </div>
+        </div>
+        <section className="wrong-answer-list">
+          <h3>
+            {current.wrongStudents.length
+              ? "Review with these students"
+              : "No wrong answers to review"}
+          </h3>
+          {current.wrongStudents.length ? (
+            <ul>
+              {current.wrongStudents.map((student) => (
+                <li key={student.studentId}>{student.displayName}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              Everyone who answered selected the correct answer without a
+              recorded mistake.
+            </p>
+          )}
+        </section>
+      </article>
     </section>
   );
 }
