@@ -1177,6 +1177,28 @@ function ClassReview({
   });
   const current = metrics[n - 1],
     exemplar = allQuestions(scenarios[0])[n - 1];
+  const studentAnswerRows = included.map((student) => {
+    const question = allQuestions(scenario(student.scenarioId))[n - 1];
+    const history = attempts
+      .filter(
+        (a) =>
+          a.studentId === student.studentId && a.questionId === question.id,
+      )
+      .sort((a, b) => a.attemptNumber - b.attemptNumber);
+    const completed = history.find((a) => a.questionCompleted);
+    return {
+      student,
+      question,
+      history,
+      status: !history.length
+        ? "Not started"
+        : !completed
+          ? "In progress"
+          : completed.correct
+            ? "Completed · correct"
+            : "Completed · not solved",
+    };
+  });
   const toggleStudent = (id: string) =>
     setExcluded((old) => {
       const next = new Set(old);
@@ -1286,6 +1308,60 @@ function ClassReview({
               recorded mistake.
             </p>
           )}
+        </section>
+        <section className="student-answer-review">
+          <h3>Student answers so far</h3>
+          <div className="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Status</th>
+                  <th>Answers submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                {studentAnswerRows.map(
+                  ({ student, question, history, status }) => (
+                    <tr key={student.studentId}>
+                      <td>
+                        <b>{student.displayName}</b>
+                      </td>
+                      <td>
+                        <span
+                          className={`answer-status ${status === "In progress" ? "in-progress" : status.includes("correct") ? "answer-correct" : status.includes("not solved") ? "answer-wrong" : "not-started"}`}
+                        >
+                          {status}
+                        </span>
+                      </td>
+                      <td>
+                        {history.length ? (
+                          history.map((attempt) => {
+                            const option = question.options.find(
+                              (o) => o.id === attempt.selectedOption,
+                            );
+                            return (
+                              <span
+                                className={`attempt-chip ${attempt.correct ? "correct-attempt" : "wrong-attempt"}`}
+                                key={`${attempt.timestamp}-${attempt.attemptNumber}`}
+                              >
+                                Attempt {attempt.attemptNumber}:{" "}
+                                {attempt.selectedOption}.{" "}
+                                {option?.text || "Answer unavailable"} ·{" "}
+                                {attempt.correct ? "Correct" : "Incorrect"}
+                              </span>
+                            );
+                          })
+                        ) : (
+                          <span className="muted">No answer submitted yet</span>
+                        )}
+                      </td>
+                    </tr>
+                  ),
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       </article>
     </section>

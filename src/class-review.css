@@ -160,6 +160,61 @@
   color: #82370d;
   font-weight: 700;
 }
+.student-answer-review {
+  margin-top: 1.25rem;
+}
+.student-answer-review h3 {
+  margin-bottom: 0.65rem;
+}
+.student-answer-review table {
+  white-space: normal;
+}
+.student-answer-review th:first-child,
+.student-answer-review td:first-child {
+  min-width: 140px;
+}
+.student-answer-review th:nth-child(2),
+.student-answer-review td:nth-child(2) {
+  min-width: 145px;
+}
+.answer-status {
+  display: inline-block;
+  padding: 0.35rem 0.55rem;
+  border-radius: 20px;
+  background: #e8ecea;
+  color: #56635d;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.answer-status.in-progress {
+  background: #fff0c7;
+  color: #775300;
+}
+.answer-status.answer-correct {
+  background: #dff3e7;
+  color: #075c42;
+}
+.answer-status.answer-wrong {
+  background: #ffe0dc;
+  color: #9b2f27;
+}
+.attempt-chip {
+  display: block;
+  margin: 0.25rem 0;
+  padding: 0.48rem 0.6rem;
+  border-left: 3px solid #a7b8af;
+  border-radius: 0 6px 6px 0;
+  background: #f4f7f5;
+  line-height: 1.4;
+}
+.attempt-chip.correct-attempt {
+  border-color: #2f9d69;
+  background: #edf8f1;
+}
+.attempt-chip.wrong-attempt {
+  border-color: #d06b3d;
+  background: #fff3eb;
+}
 @media (max-width: 800px) {
   .student-selector {
     grid-template-columns: 1fr;
