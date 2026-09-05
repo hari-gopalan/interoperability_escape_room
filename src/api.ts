@@ -10,15 +10,50 @@ function enqueue<T>(job: () => Promise<T>) {
   return run;
 }
 async function post<T>(action: string, payload: object): Promise<T> {
-  const r = await fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ app: APP_ID, action, ...payload }),
-  });
-  if (!r.ok) throw new Error("network");
-  const j = await r.json();
+  let r: Response;
+  try {
+    r = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ app: APP_ID, action, ...payload }),
+    });
+  } catch {
+    throw new Error(
+      "Cannot reach Google Sheets. Check your connection, then try again.",
+    );
+  }
+  if (!r.ok)
+    throw new Error(
+      `Google Sheets returned HTTP ${r.status}. Please try again.`,
+    );
+  let j;
+  try {
+    j = await r.json();
+  } catch {
+    throw new Error(
+      "Google Sheets returned an unreadable response. Please try again.",
+    );
+  }
   if (!j.ok) throw new Error(j.error || "request_failed");
   return j;
+}
+async function retryPost<T>(action: string, payload: object) {
+  try {
+    return await post<T>(action, payload);
+  } catch (firstError) {
+    const message = firstError instanceof Error ? firstError.message : "";
+    if (
+      !message.startsWith("Cannot reach") &&
+      !message.startsWith("Google Sheets returned")
+    )
+      throw firstError;
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    try {
+      return await post<T>(action, payload);
+    } catch {
+      throw firstError;
+    }
+  }
 }
 const key = (id: string) => `interop_progress_${id}`;
 export async function ensureBackend() {
@@ -32,7 +67,7 @@ export async function ensureBackend() {
   return j;
 }
 export async function login(studentName: string, pin: string) {
-  return post<{
+  return retryPost<{
     ok: true;
     student: Student;
     progress?: Progress;
@@ -67,7 +102,7 @@ export function cached(id: string) {
   }
 }
 export async function instructorData() {
-  return post<{
+  return retryPost<{
     ok: true;
     students: Student[];
     progress: Progress[];
