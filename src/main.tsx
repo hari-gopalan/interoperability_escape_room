@@ -1140,6 +1140,18 @@ const genericReviewPrompts = [
   "What combination of technical, semantic, workflow and governance practices best supports safe interoperability?",
 ];
 
+function genericizeReviewAnswer(text: string) {
+  return text
+    .replace(
+      /CT scanner|MRI scanner|DR console|ultrasound system|satellite imaging equipment/gi,
+      "imaging system",
+    )
+    .replace(
+      /CT expansion|MRI replacement|digital radiography|ultrasound upgrade|satellite imaging/gi,
+      "imaging project",
+    );
+}
+
 function ClassReview({
   n,
   setPick,
@@ -1199,6 +1211,31 @@ function ClassReview({
             : "Completed · not solved",
     };
   });
+  const correctAnswer = genericizeReviewAnswer(
+    exemplar.options.find((o) => o.id === exemplar.correctOptionId)?.text ||
+      "Correct answer unavailable",
+  );
+  const correctSelections = studentAnswerRows.reduce(
+    (total, row) => total + row.history.filter((a) => a.correct).length,
+    0,
+  );
+  const wrongAnswerCounts = new Map<string, number>();
+  studentAnswerRows.forEach(({ question, history }) =>
+    history
+      .filter((attempt) => !attempt.correct)
+      .forEach((attempt) => {
+        const option = question.options.find(
+          (o) => o.id === attempt.selectedOption,
+        );
+        const text = genericizeReviewAnswer(
+          option?.text || "Answer unavailable",
+        );
+        wrongAnswerCounts.set(text, (wrongAnswerCounts.get(text) || 0) + 1);
+      }),
+  );
+  const wrongAnswers = [...wrongAnswerCounts.entries()].sort(
+    (a, b) => b[1] - a[1],
+  );
   const toggleStudent = (id: string) =>
     setExcluded((old) => {
       const next = new Set(old);
@@ -1290,78 +1327,35 @@ function ClassReview({
             <span>students made a mistake</span>
           </div>
         </div>
-        <section className="wrong-answer-list">
-          <h3>
-            {current.wrongStudents.length
-              ? "Review with these students"
-              : "No wrong answers to review"}
-          </h3>
-          {current.wrongStudents.length ? (
-            <ul>
-              {current.wrongStudents.map((student) => (
-                <li key={student.studentId}>{student.displayName}</li>
-              ))}
-            </ul>
+        <section className="answer-distribution">
+          <h3>Answer review</h3>
+          <article className="review-answer correct-review-answer">
+            <span>Correct answer</span>
+            <b>{correctAnswer}</b>
+            <small>
+              Chosen correctly {correctSelections} time
+              {correctSelections === 1 ? "" : "s"}
+            </small>
+          </article>
+          <h3>Other answers students chose</h3>
+          {wrongAnswers.length ? (
+            wrongAnswers.map(([answer, count]) => (
+              <article
+                className="review-answer chosen-wrong-answer"
+                key={answer}
+              >
+                <span>Incorrect selection</span>
+                <b>{answer}</b>
+                <small>
+                  Chosen {count} time{count === 1 ? "" : "s"}
+                </small>
+              </article>
+            ))
           ) : (
-            <p>
-              Everyone who answered selected the correct answer without a
-              recorded mistake.
+            <p className="no-other-answers">
+              No incorrect answers have been selected for this question.
             </p>
           )}
-        </section>
-        <section className="student-answer-review">
-          <h3>Student answers so far</h3>
-          <div className="tablewrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Status</th>
-                  <th>Answers submitted</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentAnswerRows.map(
-                  ({ student, question, history, status }) => (
-                    <tr key={student.studentId}>
-                      <td>
-                        <b>{student.displayName}</b>
-                      </td>
-                      <td>
-                        <span
-                          className={`answer-status ${status === "In progress" ? "in-progress" : status.includes("correct") ? "answer-correct" : status.includes("not solved") ? "answer-wrong" : "not-started"}`}
-                        >
-                          {status}
-                        </span>
-                      </td>
-                      <td>
-                        {history.length ? (
-                          history.map((attempt) => {
-                            const option = question.options.find(
-                              (o) => o.id === attempt.selectedOption,
-                            );
-                            return (
-                              <span
-                                className={`attempt-chip ${attempt.correct ? "correct-attempt" : "wrong-attempt"}`}
-                                key={`${attempt.timestamp}-${attempt.attemptNumber}`}
-                              >
-                                Attempt {attempt.attemptNumber}:{" "}
-                                {attempt.selectedOption}.{" "}
-                                {option?.text || "Answer unavailable"} ·{" "}
-                                {attempt.correct ? "Correct" : "Incorrect"}
-                              </span>
-                            );
-                          })
-                        ) : (
-                          <span className="muted">No answer submitted yet</span>
-                        )}
-                      </td>
-                    </tr>
-                  ),
-                )}
-              </tbody>
-            </table>
-          </div>
         </section>
       </article>
     </section>
