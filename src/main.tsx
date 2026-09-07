@@ -1233,9 +1233,12 @@ function ClassReview({
         wrongAnswerCounts.set(text, (wrongAnswerCounts.get(text) || 0) + 1);
       }),
   );
-  const wrongAnswers = [...wrongAnswerCounts.entries()].sort(
-    (a, b) => b[1] - a[1],
-  );
+  const wrongAnswers = exemplar.options
+    .filter((option) => option.id !== exemplar.correctOptionId)
+    .map((option) => genericizeReviewAnswer(option.text))
+    .filter((answer, index, answers) => answers.indexOf(answer) === index)
+    .map((answer) => [answer, wrongAnswerCounts.get(answer) || 0] as const)
+    .sort((a, b) => b[1] - a[1]);
   const toggleStudent = (id: string) =>
     setExcluded((old) => {
       const next = new Set(old);
@@ -1337,25 +1340,19 @@ function ClassReview({
               {correctSelections === 1 ? "" : "s"}
             </small>
           </article>
-          <h3>Other answers students chose</h3>
-          {wrongAnswers.length ? (
-            wrongAnswers.map(([answer, count]) => (
-              <article
-                className="review-answer chosen-wrong-answer"
-                key={answer}
-              >
-                <span>Incorrect selection</span>
-                <b>{answer}</b>
-                <small>
-                  Chosen {count} time{count === 1 ? "" : "s"}
-                </small>
-              </article>
-            ))
-          ) : (
-            <p className="no-other-answers">
-              No incorrect answers have been selected for this question.
-            </p>
-          )}
+          <h3>All other answer options</h3>
+          {wrongAnswers.map(([answer, count]) => (
+            <article
+              className={`review-answer chosen-wrong-answer ${count === 0 ? "not-chosen" : ""}`}
+              key={answer}
+            >
+              <span>Incorrect answer</span>
+              <b>{answer}</b>
+              <small>
+                Chosen {count} time{count === 1 ? "" : "s"}
+              </small>
+            </article>
+          ))}
         </section>
       </article>
     </section>

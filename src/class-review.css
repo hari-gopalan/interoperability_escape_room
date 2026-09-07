@@ -200,6 +200,11 @@
   background: #fff1b9;
   color: #624900;
 }
+.chosen-wrong-answer.not-chosen {
+  background: #fff8dc;
+  border-color: #eadb9f;
+  color: #75652f;
+}
 .no-other-answers {
   margin: 0;
   padding: 1rem;
