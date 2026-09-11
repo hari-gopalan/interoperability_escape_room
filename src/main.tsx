@@ -444,12 +444,18 @@ function StudentApp({
     if (p.currentQuestion === 14) {
       const r = resultFor(p.student, p.attempts);
       np = { ...p, completed: true, result: r };
-      try {
-        await api.saveResult(r, np);
-      } catch {
-        setMsg("Your completed result could not be saved. Please try again.");
-        return;
-      }
+      setP(np);
+      setMsg("Result ready · syncing to Google Sheets…");
+      void api
+        .saveResult(r, np)
+        .then(() => setMsg("Result saved to Google Sheets."))
+        .catch(() =>
+          setMsg(
+            "Result is saved on this device. Google Sheets sync is delayed.",
+          ),
+        );
+      setSceneOpen(false);
+      return;
     }
     setP(np);
     setSceneOpen(false);
@@ -480,7 +486,14 @@ function StudentApp({
     }
   }
   if (p.completed && p.result)
-    return <ResultView p={p} onExit={onExit} onReset={resetForTesting} />;
+    return (
+      <ResultView
+        p={p}
+        onExit={onExit}
+        onReset={resetForTesting}
+        syncMessage={msg}
+      />
+    );
   const remaining = 3 - prior.length,
     max = POINTS[Math.min(prior.length, 2)];
   return (
@@ -676,10 +689,12 @@ function ResultView({
   p,
   onExit,
   onReset,
+  syncMessage,
 }: {
   p: Progress;
   onExit: () => void;
   onReset: () => Promise<void>;
+  syncMessage?: string;
 }) {
   const [r, setReview] = useState(false),
     x = p.result!,
@@ -692,6 +707,11 @@ function ResultView({
         <h1>{b[0]}</h1>
         <h2>{b[1]}</h2>
         <p>{b[2]}</p>
+        {syncMessage && (
+          <p className="result-sync" role="status">
+            {syncMessage}
+          </p>
+        )}
         <div className="scoregrid">
           <div>
             <small>Student</small>

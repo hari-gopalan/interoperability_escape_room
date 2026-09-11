@@ -300,3 +300,14 @@
 .crash-recovery p {
   line-height: 1.6;
 }
+.result-sync {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #b8daca;
+  border-radius: 8px;
+  background: #e8f5ee;
+  color: #075c42;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
