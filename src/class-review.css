@@ -285,3 +285,18 @@
     white-space: normal;
   }
 }
+
+.crash-recovery-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: linear-gradient(145deg, #eef6f2, #dcebe3);
+}
+.crash-recovery {
+  width: min(620px, 100%);
+  border-top: 5px solid #075c42;
+}
+.crash-recovery p {
+  line-height: 1.6;
+}

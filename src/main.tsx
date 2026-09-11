@@ -23,7 +23,30 @@ import type {
   ScenarioId,
   Student,
 } from "./types";
-const scenario = (id: ScenarioId) => scenarios.find((s) => s.id === id)!;
+const validScenarioId = (id: unknown): id is ScenarioId =>
+  typeof id === "string" && /^[A-E]$/.test(id);
+const scenario = (id: ScenarioId | string | undefined) =>
+  scenarios.find((s) => s.id === id) || scenarios[0];
+const safeProgress = (value: Progress | null | undefined, student: Student) => {
+  if (!value || typeof value !== "object") return blankProgress(student);
+  const safeStudent = {
+    ...student,
+    scenarioId: validScenarioId(value.student?.scenarioId)
+      ? value.student.scenarioId
+      : validScenarioId(student.scenarioId)
+        ? student.scenarioId
+        : "A",
+  } as Student;
+  return {
+    ...value,
+    student: safeStudent,
+    attempts: Array.isArray(value.attempts) ? value.attempts : [],
+    currentQuestion: Number.isFinite(Number(value.currentQuestion))
+      ? Math.max(0, Math.min(14, Number(value.currentQuestion)))
+      : 0,
+    completed: Boolean(value.completed),
+  } as Progress;
+};
 const attemptsFor = (p: Progress, q: Question) =>
   p.attempts.filter((a) => a.questionId === q.id);
 const outcome = (p: Progress, q: Question) =>
@@ -100,9 +123,10 @@ function Login({
         const r = await api.login(u.trim(), p.trim());
         setMusic(true);
         onStudent(
-          r.progress ||
-            api.cached(r.student.studentId) ||
-            blankProgress(r.student),
+          safeProgress(
+            r.progress || api.cached(r.student.studentId),
+            r.student,
+          ),
         );
       }
     } catch (e) {
@@ -1417,4 +1441,51 @@ function App() {
   if (inst) return <Instructor onExit={() => setInst(false)} />;
   return <Login onStudent={setP} onInstructor={() => setInst(true)} />;
 }
-createRoot(document.getElementById("root")!).render(<App />);
+class AppErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error: unknown) {
+    console.error("Incident Room render recovery", error);
+  }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <div className="crash-recovery-shell">
+        <section className="crash-recovery card">
+          <p className="eyebrow">Display recovery</p>
+          <h1>The incident room needs to reconnect.</h1>
+          <p>
+            Your Google Sheets data has not been deleted. Reload the app first.
+            If the screen returns, clear only this browser's temporary Incident
+            Room cache and sign in again.
+          </p>
+          <div className="actions">
+            <button className="primary" onClick={() => location.reload()}>
+              Reload app
+            </button>
+            <button
+              onClick={() => {
+                Object.keys(localStorage)
+                  .filter((key) => key.startsWith("interop_progress_"))
+                  .forEach((key) => localStorage.removeItem(key));
+                location.reload();
+              }}
+            >
+              Clear temporary cache and reload
+            </button>
+          </div>
+        </section>
+      </div>
+    );
+  }
+}
+createRoot(document.getElementById("root")!).render(
+  <AppErrorBoundary>
+    <App />
+  </AppErrorBoundary>,
+);
